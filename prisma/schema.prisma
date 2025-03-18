@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model winner {
+  id            Int      @id @default(autoincrement())
+  name          String
+  phone         String
+  email         String
+  state         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ticket_number String
+  prize_amount  String
+  winner_rank   String?
+  lottery_id    Int
+  claimed       Boolean  @default(false)
+  lottery       lottery  @relation(fields: [lottery_id], references: [id])
+
+  @@index([ticket_number])
+  @@index([phone])
+  @@index([email])
+  @@index([lottery_id], map: "winner_lottery_id_fkey")
+}
+
+model admin {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique(map: "Admin_email_key")
+  password  String
+  role      admin_role @default(sub_admin)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+
+  @@index([email], map: "Admin_email_idx")
+}
+
+model buyer {
+  id                 Int                      @id @default(autoincrement())
+  name               String
+  email              String
+  phone              String
+  state              String
+  lottery_id         Int?
+  ticket_package_id  Int?
+  transaction_id     String?                  @unique(map: "Buyer_transaction_id_key")
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime
+  transaction_status buyer_transaction_status @default(not_verified)
+  is_read            Boolean                  @default(false)
+  lottery            lottery?                 @relation(fields: [lottery_id], references: [id], map: "Buyer_lottery_id_fkey")
+  ticketpackage      ticketpackage?           @relation(fields: [ticket_package_id], references: [id], map: "Buyer_ticket_package_id_fkey")
+  ticket             ticket[]
+
+  @@index([email], map: "Buyer_email_idx")
+  @@index([lottery_id], map: "Buyer_lottery_id_fkey")
+  @@index([phone], map: "Buyer_phone_idx")
+  @@index([ticket_package_id], map: "Buyer_ticket_package_id_fkey")
+}
+
+model enquiry {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  @@index([createdAt], map: "Enquiry_createdAt_idx")
+  @@index([email], map: "Enquiry_email_idx")
+}
+
+model lottery {
+  id          Int      @id @default(autoincrement())
+  name        String
+  result_time String
+  is_active   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  result_date String
+  buyer       buyer[]
+  ticket      ticket[]
+  winner      winner[]
+
+  @@index([result_time], map: "Lottery_result_time_idx")
+}
+
+model ticket {
+  id                Int           @id @default(autoincrement())
+  lottery_id        Int
+  ticket_package_id Int
+  ticket_number     String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime
+  transaction_id    String
+  buyer_id          Int
+  buyer             buyer         @relation(fields: [buyer_id], references: [id], map: "Ticket_buyer_id_fkey")
+  lottery           lottery       @relation(fields: [lottery_id], references: [id], map: "Ticket_lottery_id_fkey")
+  ticketpackage     ticketpackage @relation(fields: [ticket_package_id], references: [id], map: "Ticket_ticket_package_id_fkey")
+
+  @@unique([lottery_id, ticket_number, transaction_id], map: "Ticket_lottery_id_ticket_number_transaction_id_key")
+  @@index([buyer_id], map: "Ticket_buyer_id_fkey")
+  @@index([lottery_id], map: "Ticket_lottery_id_idx")
+  @@index([ticket_package_id], map: "Ticket_ticket_package_id_fkey")
+}
+
+model ticketpackage {
+  id                Int      @id @default(autoincrement())
+  name              String
+  number_of_tickets Int
+  paid_tickets      Int
+  free_tickets      Int?
+  price             Float
+  is_active         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+  buyer             buyer[]
+  ticket            ticket[]
+}
+
+enum admin_role {
+  admin
+  sub_admin
+}
+
+enum buyer_transaction_status {
+  not_verified
+  verified
+  failed
+  success
+  refunded
+  rejected
+}

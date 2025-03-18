@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StatsRoute = exports.BuyerRoute = exports.EnquiryRoute = exports.WinnerRoute = exports.TicketPackageRoute = exports.LotteryRoute = exports.AdminRoute = void 0;
+const admin_routes_1 = __importDefault(require("./admin.routes"));
+exports.AdminRoute = admin_routes_1.default;
+const lottery_routes_1 = __importDefault(require("./lottery.routes"));
+exports.LotteryRoute = lottery_routes_1.default;
+const ticketPackage_routes_1 = __importDefault(require("./ticketPackage.routes"));
+exports.TicketPackageRoute = ticketPackage_routes_1.default;
+const winner_routes_1 = __importDefault(require("./winner.routes"));
+exports.WinnerRoute = winner_routes_1.default;
+const enquiry_routes_1 = __importDefault(require("./enquiry.routes"));
+exports.EnquiryRoute = enquiry_routes_1.default;
+const buyer_routes_1 = __importDefault(require("./buyer.routes"));
+exports.BuyerRoute = buyer_routes_1.default;
+const stats_routes_1 = __importDefault(require("./stats.routes"));
+exports.StatsRoute = stats_routes_1.default;
