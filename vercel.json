@@ -11,7 +11,7 @@
         "src": "/api/(.*)",
         "headers": {
           "Access-Control-Allow-Origin": "https://keralastatemegalottery.com",
-          "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE, PATCH",
           "Access-Control-Allow-Headers": "Content-Type, Authorization"
         },
         "dest": "/src/index.ts"
