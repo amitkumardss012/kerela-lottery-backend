@@ -117,6 +117,7 @@ class WinnerService {
         state: true,
         prize_amount: true,
       },
+      take: 1, // Limit to return only one result
     });
     return winner;
   }

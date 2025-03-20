@@ -21,6 +21,24 @@ exports.createWinner = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
     const lottery = yield services_1.LotteryService.getById(Number(validatedData.lottery_id));
     if (!lottery)
         return next(new response_util_1.ErrorResponse("Lottery not found", types_1.statusCode.Not_Found));
+    const existingWinner = yield config_1.prisma.winner.findFirst({
+        where: {
+            OR: [
+                {
+                    phone: {
+                        equals: validatedData.phone,
+                    },
+                },
+                {
+                    email: {
+                        equals: validatedData.email,
+                    },
+                },
+            ],
+        },
+    });
+    if (existingWinner)
+        return next(new response_util_1.ErrorResponse("Winner with the same email and phone already exists", types_1.statusCode.Conflict));
     const winner = yield services_1.WinnerService.createWinner(validatedData);
     return (0, response_util_1.SuccessResponse)(res, "Winner created successfully", winner, types_1.statusCode.Created);
 }));

@@ -12,6 +12,25 @@ export const createWinner = asyncHandler(async (req, res, next) => {
   if(!lottery)
     return next(new ErrorResponse("Lottery not found", statusCode.Not_Found))
 
+  const existingWinner = await prisma.winner.findFirst({
+    where: {
+      OR: [
+        {
+          phone: {
+            equals: validatedData.phone,
+          },
+        },
+        {
+          email: {
+            equals: validatedData.email,
+          },
+        },
+      ],
+    },
+  });
+  if(existingWinner)
+    return next(new ErrorResponse("Winner with the same email and phone already exists", statusCode.Conflict));
+
   const winner = await WinnerService.createWinner(validatedData);
   return SuccessResponse(
     res,
