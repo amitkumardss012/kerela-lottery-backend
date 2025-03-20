@@ -12,6 +12,9 @@ export const createTicketPackage = asyncHandler(async (req, res, next) => {
   if(validatedData.number_of_tickets < (validatedData.paid_tickets ?? 0) + (validatedData.free_tickets ?? 0))
     return next(new ErrorResponse("Invalid number of tickets", statusCode.Bad_Request))
 
+  if(validatedData.number_of_tickets != (validatedData.paid_tickets ?? 0) + (validatedData.free_tickets ?? 0))
+    return next(new ErrorResponse("Total tickets must be equal to paid + free tickets.", statusCode.Bad_Request))
+
   const ticketPackage = await TicketPackageService.create(validatedData);
 
   return SuccessResponse(
