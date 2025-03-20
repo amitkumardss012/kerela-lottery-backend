@@ -20,7 +20,7 @@ lottery.get("/all", LotteryController.getAllLotteries);
 lottery
   .route("/:id")
   .get(LotteryController.getLotteryById) // 🔍 Get lottery details by ID
-  .patch(LotteryController.updateLottery) // ✏️ Update lottery details by ID
+  .put(LotteryController.updateLottery) // ✏️ Update lottery details by ID
   .delete(LotteryController.deleteLottery); // 🗑️ Delete a lottery by ID
 
 // 📤 Export the router to be used in the main application

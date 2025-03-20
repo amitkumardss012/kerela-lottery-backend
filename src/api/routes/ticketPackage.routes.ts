@@ -25,7 +25,7 @@ ticketPackage
   // 🔍 Get ticket package by ID
   .get(TicketPackageController.getTicketPackageById)
   // ✏️ Update ticket package by ID
-  .patch(TicketPackageController.updateTicketPackage)
+  .put(TicketPackageController.updateTicketPackage)
   // 🗑️ Delete ticket package by ID
   .delete(TicketPackageController.deleteTicketPackage);
 

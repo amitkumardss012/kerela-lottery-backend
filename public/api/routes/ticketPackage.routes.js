@@ -18,7 +18,7 @@ ticketPackage
     // 🔍 Get ticket package by ID
     .get(controllers_1.TicketPackageController.getTicketPackageById)
     // ✏️ Update ticket package by ID
-    .patch(controllers_1.TicketPackageController.updateTicketPackage)
+    .put(controllers_1.TicketPackageController.updateTicketPackage)
     // 🗑️ Delete ticket package by ID
     .delete(controllers_1.TicketPackageController.deleteTicketPackage);
 // 📤 Export the router
