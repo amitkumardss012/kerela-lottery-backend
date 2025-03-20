@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWinnerByLotteryId = exports.searchWinner = exports.getWinnerById = exports.getAllWinners = exports.deleteWinner = exports.updateWinner = exports.createWinner = void 0;
+exports.getWinnerByLotteryId = exports.markAsClaimed = exports.searchWinner = exports.getWinnerById = exports.getAllWinners = exports.deleteWinner = exports.updateWinner = exports.createWinner = void 0;
 const middlewares_1 = require("../middlewares");
 const services_1 = require("../services");
 const types_1 = require("../types/types");
@@ -99,6 +99,17 @@ exports.searchWinner = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
     if (!winner)
         return next(new response_util_1.ErrorResponse("Winner not found", types_1.statusCode.Not_Found));
     return (0, response_util_1.SuccessResponse)(res, "Winner fetched successfully", winner);
+}));
+exports.markAsClaimed = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    if (!id || isNaN(id))
+        return next(new response_util_1.ErrorResponse("Invalid id", types_1.statusCode.Bad_Request));
+    const winner = yield config_1.prisma.winner.findUnique({ where: { id } });
+    if (!winner)
+        return next(new response_util_1.ErrorResponse("Winner not found", types_1.statusCode.Not_Found));
+    const newClaimStatus = !winner.claimed;
+    const updatedWinner = yield config_1.prisma.winner.update({ where: { id }, data: { claimed: newClaimStatus } });
+    return (0, response_util_1.SuccessResponse)(res, `Winner ${updatedWinner.name} marked as ${newClaimStatus ? 'claimed' : 'pending'}`, updatedWinner, types_1.statusCode.OK);
 }));
 exports.getWinnerByLotteryId = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = Number(req.params.id);

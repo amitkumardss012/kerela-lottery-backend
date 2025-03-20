@@ -12,6 +12,7 @@ winner.use(auth_middleware_1.authenticate, auth_middleware_1.allowSubAdmin);
 winner.post("/create", controllers_1.WinnerController.createWinner);
 winner.get("/lottery/:id", controllers_1.WinnerController.getWinnerByLotteryId);
 winner.route("/:id")
-    .patch(controllers_1.WinnerController.updateWinner)
+    .post(controllers_1.WinnerController.markAsClaimed)
+    .put(controllers_1.WinnerController.updateWinner)
     .delete(controllers_1.WinnerController.deleteWinner);
 exports.default = winner;

@@ -14,7 +14,8 @@ winner.post("/create", WinnerController.createWinner);
 winner.get("/lottery/:id", WinnerController.getWinnerByLotteryId)
 
 winner.route("/:id")
-    .patch(WinnerController.updateWinner)
+.post(WinnerController.markAsClaimed)
+    .put(WinnerController.updateWinner)
     .delete(WinnerController.deleteWinner)
 
 export default winner;

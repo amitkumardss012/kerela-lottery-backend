@@ -131,6 +131,26 @@ export const searchWinner = asyncHandler(async (req, res, next) => {
   return SuccessResponse(res, "Winner fetched successfully", winner);
 });
 
+export const markAsClaimed = asyncHandler(async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id))
+    return next(new ErrorResponse("Invalid id", statusCode.Bad_Request));
+
+  const winner = await prisma.winner.findUnique({ where: { id } });
+  if (!winner)
+    return next(new ErrorResponse("Winner not found", statusCode.Not_Found));
+
+  const newClaimStatus = !winner.claimed;
+  const updatedWinner = await prisma.winner.update({ where: { id }, data: { claimed: newClaimStatus } });
+
+  return SuccessResponse(
+    res,
+    `Winner ${updatedWinner.name} marked as ${newClaimStatus ? 'claimed' : 'pending'}`,
+    updatedWinner,
+    statusCode.OK
+  );
+});
+
 export const getWinnerByLotteryId = asyncHandler(async (req, res, next) => {
   const id = Number(req.params.id);
   if (!id || isNaN(id))
