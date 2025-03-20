@@ -98,6 +98,7 @@ export const BuyLottery = asyncHandler(async (req, res, next) => {
   return SuccessResponse(res, "Lottery bought successfully", {
     buyer,
     tickets,
+    ticket_package: ticket_package.name,
   }, statusCode.Created);
 });
 

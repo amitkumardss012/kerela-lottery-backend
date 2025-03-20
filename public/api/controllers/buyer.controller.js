@@ -83,6 +83,7 @@ exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __await
     return (0, response_util_1.SuccessResponse)(res, "Lottery bought successfully", {
         buyer,
         tickets,
+        ticket_package: ticket_package.name,
     }, types_1.statusCode.Created);
 }));
 exports.getAllBuyers = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
