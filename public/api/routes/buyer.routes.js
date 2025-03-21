@@ -12,5 +12,5 @@ buyer
     .route("/:id")
     .get(controllers_1.BuyerController.getBuyerById)
     .delete(controllers_1.BuyerController.deleteBuyer)
-    .patch(controllers_1.BuyerController.updateBuyerStatus);
+    .post(controllers_1.BuyerController.toggleBuyerStatus);
 exports.default = buyer;

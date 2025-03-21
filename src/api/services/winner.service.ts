@@ -97,11 +97,6 @@ class WinnerService {
             },
           },
           {
-            email: {
-              contains: query,
-            },
-          },
-          {
             name: {
               contains: query,
             },

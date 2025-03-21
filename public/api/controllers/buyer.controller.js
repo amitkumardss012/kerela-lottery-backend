@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBuyerStatus = exports.searchBuyer = exports.deleteBuyer = exports.getBuyerById = exports.getAllBuyers = exports.BuyLottery = void 0;
+exports.toggleBuyerStatus = exports.updateBuyerStatus = exports.searchBuyer = exports.deleteBuyer = exports.getBuyerById = exports.getAllBuyers = exports.BuyLottery = void 0;
 const config_1 = require("../../config");
 const middlewares_1 = require("../middlewares");
 const services_1 = require("../services");
@@ -219,4 +219,22 @@ exports.updateBuyerStatus = (0, middlewares_1.asyncHandler)((req, res, next) => 
         return next(new utils_1.ErrorResponse("Buyer not found", types_1.statusCode.Not_Found));
     }
     return (0, response_util_1.SuccessResponse)(res, "Buyer status updated successfully", buyer, types_1.statusCode.OK);
+}));
+exports.toggleBuyerStatus = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    if (!id || isNaN(id)) {
+        return next(new utils_1.ErrorResponse("Invalid id", types_1.statusCode.Bad_Request));
+    }
+    const buyer = yield config_1.prisma.buyer.findUnique({
+        where: { id },
+    });
+    if (!buyer) {
+        return next(new utils_1.ErrorResponse("Buyer not found", types_1.statusCode.Not_Found));
+    }
+    const updatedStatus = buyer.transaction_status === 'verified' ? 'not_verified' : 'verified';
+    const updatedBuyer = yield config_1.prisma.buyer.update({
+        where: { id },
+        data: { transaction_status: updatedStatus },
+    });
+    return (0, response_util_1.SuccessResponse)(res, "Buyer status updated successfully", updatedBuyer, types_1.statusCode.OK);
 }));

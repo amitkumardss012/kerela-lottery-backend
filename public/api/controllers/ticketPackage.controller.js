@@ -22,6 +22,8 @@ const ticketPackage_service_1 = __importDefault(require("../services/ticketPacka
 exports.createTicketPackage = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     const validatedData = validators_1.TicketPackageValidator.parse(req.body);
+    if (validatedData.number_of_tickets > 25)
+        return next(new utils_1.ErrorResponse("Only 25 tickets are allowed", types_1.statusCode.Bad_Request));
     if (validatedData.number_of_tickets < ((_a = validatedData.paid_tickets) !== null && _a !== void 0 ? _a : 0) + ((_b = validatedData.free_tickets) !== null && _b !== void 0 ? _b : 0))
         return next(new utils_1.ErrorResponse("Invalid number of tickets", types_1.statusCode.Bad_Request));
     if (validatedData.number_of_tickets != ((_c = validatedData.paid_tickets) !== null && _c !== void 0 ? _c : 0) + ((_d = validatedData.free_tickets) !== null && _d !== void 0 ? _d : 0))

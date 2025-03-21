@@ -15,6 +15,6 @@ buyer
   .route("/:id")
   .get(BuyerController.getBuyerById)
   .delete(BuyerController.deleteBuyer)
-  .patch(BuyerController.updateBuyerStatus);
+  .post(BuyerController.toggleBuyerStatus);
 
 export default buyer;

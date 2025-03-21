@@ -261,3 +261,30 @@ export const updateBuyerStatus = asyncHandler(async (req, res, next) => {
 
   return SuccessResponse(res, "Buyer status updated successfully", buyer, statusCode.OK);
 });
+
+
+
+export const toggleBuyerStatus = asyncHandler(async (req, res, next) => {
+  const id = Number(req.params.id);
+
+  if (!id || isNaN(id)) {
+    return next(new ErrorResponse("Invalid id", statusCode.Bad_Request));
+  }
+
+  const buyer = await prisma.buyer.findUnique({
+    where: { id },
+  });
+
+  if (!buyer) {
+    return next(new ErrorResponse("Buyer not found", statusCode.Not_Found));
+  }
+
+  const updatedStatus = buyer.transaction_status === 'verified' ? 'not_verified' : 'verified';
+
+  const updatedBuyer = await prisma.buyer.update({
+    where: { id },
+    data: { transaction_status: updatedStatus },
+  });
+
+  return SuccessResponse(res, "Buyer status updated successfully", updatedBuyer, statusCode.OK);
+});
