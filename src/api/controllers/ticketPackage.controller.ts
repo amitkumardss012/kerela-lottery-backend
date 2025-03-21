@@ -9,6 +9,9 @@ import { Request } from "express";
 export const createTicketPackage = asyncHandler(async (req, res, next) => {
   const validatedData = TicketPackageValidator.parse(req.body);
 
+  if(validatedData.number_of_tickets > 25) 
+    return next(new ErrorResponse("Only 25 tickets are allowed", statusCode.Bad_Request))
+
   if(validatedData.number_of_tickets < (validatedData.paid_tickets ?? 0) + (validatedData.free_tickets ?? 0))
     return next(new ErrorResponse("Invalid number of tickets", statusCode.Bad_Request))
 
