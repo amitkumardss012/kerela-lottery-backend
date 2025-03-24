@@ -56,6 +56,7 @@ class WinnerService {
         email: true,
         state: true,
         prize_amount: true,
+        winner_rank: true,
       },
     });
     return winner;
@@ -111,6 +112,7 @@ class WinnerService {
         email: true,
         state: true,
         prize_amount: true,
+        winner_rank: true,
       },
       take: 1, // Limit to return only one result
     });
