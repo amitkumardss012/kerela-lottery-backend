@@ -6,6 +6,7 @@ import { rateLimit } from "express-rate-limit";
 import { errorMiddleware } from "./api/middlewares";
 import { ENV } from "./config";
 import { statusCode } from "./api/types/types";
+import path from "path"
 
 // 📦 Importing Routes
 import {
@@ -13,6 +14,7 @@ import {
   BuyerRoute,
   EnquiryRoute,
   LotteryRoute,
+  QrRoute,
   StatsRoute,
   TicketPackageRoute,
   WinnerRoute,
@@ -23,6 +25,7 @@ const app = express();
 
 // 🛡️ Security and utility middlewares
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(
@@ -58,6 +61,7 @@ app.use("/api/v1/winner", WinnerRoute);
 app.use("/api/v1/enquiry", EnquiryRoute);
 app.use("/api/v1/buyer", BuyerRoute);
 app.use("/api/v1/stats", StatsRoute);
+app.use("/api/v1/qr", QrRoute)
 
 // ⛔ 404 route handler
 app.all("*", (_, res) => {

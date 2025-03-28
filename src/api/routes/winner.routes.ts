@@ -13,14 +13,14 @@ winner.get("/all", WinnerController.getAllWinners);
 winner.get("/search", WinnerController.searchWinner);
 winner.get("/:id", WinnerController.getWinnerById);
 
-winner.use(authenticate, allowSubAdmin);
-winner.post("/create", WinnerController.createWinner);
-winner.get("/lottery/:id", WinnerController.getWinnerByLotteryId);
+winner.use(authenticate);
+winner.post("/create", allowSubAdmin, WinnerController.createWinner);
+winner.get("/lottery/:id", isAdmin, WinnerController.getWinnerByLotteryId);
 
 winner
   .route("/:id")
-  .post(WinnerController.markAsClaimed)
+  .post(isAdmin, WinnerController.markAsClaimed)
   .put(WinnerController.updateWinner)
-  .delete(WinnerController.deleteWinner);
+  .delete(isAdmin, WinnerController.deleteWinner);
 
 export default winner;

@@ -139,3 +139,11 @@ enum buyer_transaction_status {
   refunded
   rejected
 }
+
+model QRCode {
+  id        Int      @id @default(autoincrement())
+  phone     String?
+  image     Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}

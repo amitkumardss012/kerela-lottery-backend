@@ -33,7 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asyncHandler = exports.errorMiddleware = void 0;
+exports.multerUpload = exports.asyncHandler = exports.errorMiddleware = void 0;
 const error_middleware_1 = __importStar(require("./error.middleware"));
 exports.errorMiddleware = error_middleware_1.default;
 Object.defineProperty(exports, "asyncHandler", { enumerable: true, get: function () { return error_middleware_1.asyncHandler; } });
+const multer_middleware_1 = require("./multer.middleware");
+Object.defineProperty(exports, "multerUpload", { enumerable: true, get: function () { return multer_middleware_1.multerUpload; } });

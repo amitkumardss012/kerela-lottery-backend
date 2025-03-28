@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StatsRoute = exports.BuyerRoute = exports.EnquiryRoute = exports.WinnerRoute = exports.TicketPackageRoute = exports.LotteryRoute = exports.AdminRoute = void 0;
+exports.QrRoute = exports.StatsRoute = exports.BuyerRoute = exports.EnquiryRoute = exports.WinnerRoute = exports.TicketPackageRoute = exports.LotteryRoute = exports.AdminRoute = void 0;
 const admin_routes_1 = __importDefault(require("./admin.routes"));
 exports.AdminRoute = admin_routes_1.default;
 const lottery_routes_1 = __importDefault(require("./lottery.routes"));
@@ -18,3 +18,5 @@ const buyer_routes_1 = __importDefault(require("./buyer.routes"));
 exports.BuyerRoute = buyer_routes_1.default;
 const stats_routes_1 = __importDefault(require("./stats.routes"));
 exports.StatsRoute = stats_routes_1.default;
+const qr_routes_1 = __importDefault(require("./qr.routes"));
+exports.QrRoute = qr_routes_1.default;

@@ -11,12 +11,14 @@ const express_rate_limit_1 = require("express-rate-limit");
 const middlewares_1 = require("./api/middlewares");
 const config_1 = require("./config");
 const types_1 = require("./api/types/types");
+const path_1 = __importDefault(require("path"));
 // 📦 Importing Routes
 const routes_1 = require("./api/routes");
 // 🚀 Initialize express application
 const app = (0, express_1.default)();
 // 🛡️ Security and utility middlewares
 app.use(express_1.default.json());
+app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 app.use((0, helmet_1.default)());
 app.use((0, morgan_1.default)("dev"));
 app.use((0, cors_1.default)({
@@ -46,6 +48,7 @@ app.use("/api/v1/winner", routes_1.WinnerRoute);
 app.use("/api/v1/enquiry", routes_1.EnquiryRoute);
 app.use("/api/v1/buyer", routes_1.BuyerRoute);
 app.use("/api/v1/stats", routes_1.StatsRoute);
+app.use("/api/v1/qr", routes_1.QrRoute);
 // ⛔ 404 route handler
 app.all("*", (_, res) => {
     res.status(types_1.statusCode.Bad_Request).json({

@@ -8,12 +8,12 @@ const winner = (0, express_1.Router)();
 winner.get("/all", controllers_1.WinnerController.getAllWinners);
 winner.get("/search", controllers_1.WinnerController.searchWinner);
 winner.get("/:id", controllers_1.WinnerController.getWinnerById);
-winner.use(auth_middleware_1.authenticate, auth_middleware_1.allowSubAdmin);
-winner.post("/create", controllers_1.WinnerController.createWinner);
-winner.get("/lottery/:id", controllers_1.WinnerController.getWinnerByLotteryId);
+winner.use(auth_middleware_1.authenticate);
+winner.post("/create", auth_middleware_1.allowSubAdmin, controllers_1.WinnerController.createWinner);
+winner.get("/lottery/:id", auth_middleware_1.isAdmin, controllers_1.WinnerController.getWinnerByLotteryId);
 winner
     .route("/:id")
-    .post(controllers_1.WinnerController.markAsClaimed)
+    .post(auth_middleware_1.isAdmin, controllers_1.WinnerController.markAsClaimed)
     .put(controllers_1.WinnerController.updateWinner)
-    .delete(controllers_1.WinnerController.deleteWinner);
+    .delete(auth_middleware_1.isAdmin, controllers_1.WinnerController.deleteWinner);
 exports.default = winner;
