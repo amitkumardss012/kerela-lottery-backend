@@ -51,15 +51,25 @@ Qr.put(
       }
 
       if (qrCode) {
-        // 🔹 Step 3: Update the QR code in DB (Now using the new image)
+        // 🔹 Step 3: Update the QR code in DB (Only update provided fields)
+        const updateData: any = { updatedAt: new Date() };
+
+        // Only update phone if provided
+        if (phone) {
+          updateData.phone = phone;
+        }
+
+        // Only update image if a new image was uploaded
+        if (cloudinaryResult) {
+          updateData.image = {
+            public_id: cloudinaryResult.public_id,
+            secure_url: cloudinaryResult.secure_url,
+          };
+        }
+
         qrCode = await prisma.qRCode.update({
           where: { id: qrCode.id },
-          data: {
-            phone: phone || qrCode.phone,
-            image:
-               { public_id: cloudinaryResult?.public_id, secure_url: cloudinaryResult?.secure_url }
-             ,
-          },
+          data: updateData,
         });
 
         // 🔹 Step 4: Delete old image from Cloudinary (Only if a new image was uploaded)
@@ -73,7 +83,7 @@ Qr.put(
         // 🔹 Step 5: If QR code doesn't exist, create a new one
         qrCode = await prisma.qRCode.create({
           data: {
-            phone: phone || "",
+            phone: phone || "", // Default to empty string if phone is not provided
             image: cloudinaryResult
               ? { public_id: cloudinaryResult.public_id, secure_url: cloudinaryResult.secure_url }
               : undefined,
@@ -82,7 +92,7 @@ Qr.put(
         });
       }
 
-      return SuccessResponse(res, "QR code added successfully", qrCode);
+      return SuccessResponse(res, "QR code updated successfully", qrCode);
     } catch (error) {
       return next(new ErrorResponse("Failed to add QR code", statusCode.Internal_Server_Error));
     }

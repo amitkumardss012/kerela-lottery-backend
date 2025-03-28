@@ -53,13 +53,22 @@ Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asy
             }
         }
         if (qrCode) {
-            // 🔹 Step 3: Update the QR code in DB (Now using the new image)
+            // 🔹 Step 3: Update the QR code in DB (Only update provided fields)
+            const updateData = { updatedAt: new Date() };
+            // Only update phone if provided
+            if (phone) {
+                updateData.phone = phone;
+            }
+            // Only update image if a new image was uploaded
+            if (cloudinaryResult) {
+                updateData.image = {
+                    public_id: cloudinaryResult.public_id,
+                    secure_url: cloudinaryResult.secure_url,
+                };
+            }
             qrCode = yield config_1.prisma.qRCode.update({
                 where: { id: qrCode.id },
-                data: {
-                    phone: phone || qrCode.phone,
-                    image: { public_id: cloudinaryResult === null || cloudinaryResult === void 0 ? void 0 : cloudinaryResult.public_id, secure_url: cloudinaryResult === null || cloudinaryResult === void 0 ? void 0 : cloudinaryResult.secure_url },
-                },
+                data: updateData,
             });
             // 🔹 Step 4: Delete old image from Cloudinary (Only if a new image was uploaded)
             if (oldPublicId && cloudinaryResult) {
@@ -73,7 +82,7 @@ Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asy
             // 🔹 Step 5: If QR code doesn't exist, create a new one
             qrCode = yield config_1.prisma.qRCode.create({
                 data: {
-                    phone: phone || "",
+                    phone: phone || "", // Default to empty string if phone is not provided
                     image: cloudinaryResult
                         ? { public_id: cloudinaryResult.public_id, secure_url: cloudinaryResult.secure_url }
                         : undefined,
@@ -81,7 +90,7 @@ Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asy
                 },
             });
         }
-        return (0, response_util_1.SuccessResponse)(res, "QR code added successfully", qrCode);
+        return (0, response_util_1.SuccessResponse)(res, "QR code updated successfully", qrCode);
     }
     catch (error) {
         return next(new response_util_1.ErrorResponse("Failed to add QR code", types_1.statusCode.Internal_Server_Error));
