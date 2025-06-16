@@ -37,7 +37,7 @@ export const authenticate = asyncHandler(async (req, res, next) => {
         "Not authorized, admin or Sub Admin not found",
         statusCode.Unauthorized
       )
-    );
+    );  
   }
 
   req.admin = {
