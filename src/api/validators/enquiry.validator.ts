@@ -23,6 +23,8 @@ const EnquiryValidator = z.object({
     .length(10, "Phone number must be exactly 10 digits")
     .regex(/^[0-9]+$/, "Phone number can only contain digits")
     .nonempty("Phone is required"),
+  
+  
     
   subject: z
     .string()

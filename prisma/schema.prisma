@@ -68,8 +68,9 @@ model enquiry {
   name      String
   email     String
   phone     String
-  subject   String
-  message   String
+  state     String?
+  subject   String?
+  message   String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime
