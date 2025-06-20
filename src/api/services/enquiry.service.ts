@@ -48,6 +48,7 @@ class EnquiryService {
                 phone: true,
                 subject: true,
                 message: true,
+                state: true,
                 isRead: true,
                 createdAt: true,
             }
