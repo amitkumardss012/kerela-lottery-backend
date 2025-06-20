@@ -39,6 +39,12 @@ const EnquiryValidator = z.object({
     .min(10, "Message must be at least 10 characters")
     .max(1000, "Message cannot exceed 1000 characters")
     .nonempty("Message cannot be empty"),
+  state: z
+    .string()
+    .trim()
+    .min(2, "State must be at least 2 characters")
+    .max(100, "State cannot exceed 100 characters")
+    .nonempty("State cannot be empty"),
     
   isRead: z
     .boolean()
