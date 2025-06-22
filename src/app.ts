@@ -30,7 +30,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "*",
+    origin: [ENV.FRONTEND_URL as string, ENV.FRONTEND_URL1 as string],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
