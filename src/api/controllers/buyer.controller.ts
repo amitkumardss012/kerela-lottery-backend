@@ -114,6 +114,9 @@ export const getAllBuyers = asyncHandler(async (req, res, next) => {
         lottery: true,
         ticketpackage: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     }),
     prisma.buyer.count(),
   ]);
