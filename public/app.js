@@ -14,6 +14,7 @@ const types_1 = require("./api/types/types");
 const path_1 = __importDefault(require("path"));
 // 📦 Importing Routes
 const routes_1 = require("./api/routes");
+const webConfig_routes_1 = __importDefault(require("./api/routes/webConfig.routes"));
 // 🚀 Initialize express application
 const app = (0, express_1.default)();
 // 🛡️ Security and utility middlewares
@@ -49,6 +50,7 @@ app.use("/api/v1/enquiry", routes_1.EnquiryRoute);
 app.use("/api/v1/buyer", routes_1.BuyerRoute);
 app.use("/api/v1/stats", routes_1.StatsRoute);
 app.use("/api/v1/qr", routes_1.QrRoute);
+app.use("/api/v1/web-config", webConfig_routes_1.default);
 // ⛔ 404 route handler
 app.all("*", (_, res) => {
     res.status(types_1.statusCode.Bad_Request).json({

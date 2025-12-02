@@ -97,6 +97,9 @@ exports.getAllBuyers = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
                 lottery: true,
                 ticketpackage: true,
             },
+            orderBy: {
+                createdAt: "desc",
+            },
         }),
         config_1.prisma.buyer.count(),
     ]);

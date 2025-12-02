@@ -13,7 +13,7 @@ const errorMiddleware = (
   err.message ||= "Internal Server Error";
   err.statusCode ||= 500;
 
-  if (err.name === "CastError") err.message = "Invalid ID";
+  // if (err.name === "CastError") err.message = "Invalid ID";
   if ("code" in err && err.code === "P2025") {
     err.message = "Item not found";
   }

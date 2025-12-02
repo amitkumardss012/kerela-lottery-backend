@@ -25,15 +25,17 @@ const EnquiryValidator = zod_1.z.object({
     subject: zod_1.z
         .string()
         .trim()
-        .min(3, "Subject must be at least 3 characters")
-        .max(200, "Subject cannot exceed 200 characters")
-        .nonempty("Subject cannot be empty"),
+        .optional(),
     message: zod_1.z
         .string()
         .trim()
-        .min(10, "Message must be at least 10 characters")
-        .max(1000, "Message cannot exceed 1000 characters")
-        .nonempty("Message cannot be empty"),
+        .optional(),
+    state: zod_1.z
+        .string()
+        .trim()
+        .min(2, "State must be at least 2 characters")
+        .max(100, "State cannot exceed 100 characters")
+        .nonempty("State cannot be empty"),
     isRead: zod_1.z
         .boolean()
         .default(false)

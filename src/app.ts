@@ -19,6 +19,7 @@ import {
   TicketPackageRoute,
   WinnerRoute,
 } from "./api/routes";
+import WebConfigRoute  from "./api/routes/webConfig.routes";
 
 // 🚀 Initialize express application
 const app = express();
@@ -35,6 +36,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, //⌛ 15 minutes
@@ -62,6 +64,7 @@ app.use("/api/v1/enquiry", EnquiryRoute);
 app.use("/api/v1/buyer", BuyerRoute);
 app.use("/api/v1/stats", StatsRoute);
 app.use("/api/v1/qr", QrRoute)
+app.use("/api/v1/web-config", WebConfigRoute)
 
 // ⛔ 404 route handler
 app.all("*", (_, res) => {
