@@ -9,10 +9,10 @@ export const createAdmin = asyncHandler(async (req, res, next) => {
   // Validate request body against AdminValidator schema
   const validData = AdminValidator.parse(req.body);
   // Ensure only admin roles can be created
-  // if (validData.role === "admin")
-  //   return next(
-  //     new ErrorResponse("only one admin is allowed", statusCode.Bad_Request)
-  //   );
+  if (validData.role === "admin")
+    return next(
+      new ErrorResponse("only one admin is allowed", statusCode.Bad_Request)
+    );
   
   // Check for existing sub-admin and hash password concurrently
   const [existingSubAdmin, hashedPassword] = await Promise.all([

@@ -8,7 +8,7 @@ class AdminService {
                 name: data.name,
                 email: data.email, 
                 password: data.password,
-                role: 'admin',
+                role: 'sub_admin',
                 updatedAt: new Date(),
             },
         })
