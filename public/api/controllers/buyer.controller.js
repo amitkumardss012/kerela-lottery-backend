@@ -89,19 +89,41 @@ exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __await
 exports.getAllBuyers = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
+    const { startDate, endDate, exportMode } = req.query;
+    console.log("getAllBuyers Query Params:", req.query);
+    const where = {};
+    if (startDate && typeof startDate === 'string' && startDate !== 'undefined') {
+        const start = new Date(startDate);
+        if (!isNaN(start.getTime())) {
+            start.setHours(0, 0, 0, 0); // Explicitly set to start of day
+            where.createdAt = {
+                gte: start,
+            };
+        }
+    }
+    if (endDate && typeof endDate === 'string' && endDate !== 'undefined') {
+        const end = new Date(endDate);
+        if (!isNaN(end.getTime())) {
+            end.setHours(23, 59, 59, 999); // Set to end of day
+            where.createdAt = Object.assign(Object.assign({}, where.createdAt), { lte: end });
+        }
+    }
+    console.log("getAllBuyers WHERE clause:", JSON.stringify(where, null, 2));
     const [buyers, totalBuyers] = yield Promise.all([
         config_1.prisma.buyer.findMany({
+            where,
             skip: (page - 1) * limit,
             take: limit,
             include: {
                 lottery: true,
                 ticketpackage: true,
+                ticket: exportMode === 'true', // Include tickets if exportMode is enabled
             },
             orderBy: {
                 createdAt: "desc",
             },
         }),
-        config_1.prisma.buyer.count(),
+        config_1.prisma.buyer.count({ where }),
     ]);
     if (page > Math.ceil(totalBuyers / limit) && totalBuyers > 0) {
         return next(new utils_1.ErrorResponse("Page not found", types_1.statusCode.Not_Found));

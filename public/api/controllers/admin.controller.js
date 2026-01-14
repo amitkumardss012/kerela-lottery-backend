@@ -20,10 +20,8 @@ exports.createAdmin = (0, middlewares_1.asyncHandler)((req, res, next) => __awai
     // Validate request body against AdminValidator schema
     const validData = validators_1.AdminValidator.parse(req.body);
     // Ensure only admin roles can be created
-    // if (validData.role === "admin")
-    //   return next(
-    //     new ErrorResponse("only one admin is allowed", statusCode.Bad_Request)
-    //   );
+    if (validData.role === "admin")
+        return next(new utils_1.ErrorResponse("only one admin is allowed", types_1.statusCode.Bad_Request));
     // Check for existing sub-admin and hash password concurrently
     const [existingSubAdmin, hashedPassword] = yield Promise.all([
         services_1.AdminService.findByEmail(validData.email),

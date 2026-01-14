@@ -105,20 +105,49 @@ export const BuyLottery = asyncHandler(async (req, res, next) => {
 export const getAllBuyers = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
+  const { startDate, endDate, exportMode } = req.query;
+  console.log("getAllBuyers Query Params:", req.query);
+
+  const where: any = {};
+
+  if (startDate && typeof startDate === 'string' && startDate !== 'undefined') {
+    const start = new Date(startDate);
+    if (!isNaN(start.getTime())) {
+      start.setHours(0, 0, 0, 0); // Explicitly set to start of day
+      where.createdAt = {
+        gte: start,
+      };
+    }
+  }
+
+  if (endDate && typeof endDate === 'string' && endDate !== 'undefined') {
+    const end = new Date(endDate);
+    if (!isNaN(end.getTime())) {
+      end.setHours(23, 59, 59, 999); // Set to end of day
+      where.createdAt = {
+        ...where.createdAt, // Preserve gte if it exists
+        lte: end,
+      };
+    }
+  }
+
+  console.log("getAllBuyers WHERE clause:", JSON.stringify(where, null, 2));
 
   const [buyers, totalBuyers] = await Promise.all([
     prisma.buyer.findMany({
+      where,
       skip: (page - 1) * limit,
       take: limit,
       include: {
         lottery: true,
         ticketpackage: true,
+        ticket: exportMode === 'true', // Include tickets if exportMode is enabled
       },
       orderBy: {
         createdAt: "desc",
       },
     }),
-    prisma.buyer.count(),
+    prisma.buyer.count({ where }),
   ]);
 
   if (page > Math.ceil(totalBuyers / limit) && totalBuyers > 0) {
