@@ -5,13 +5,16 @@ import { asyncHandler } from "./error.middleware";
 
 export const authenticate = asyncHandler(async (req, res, next) => {
   const tokenFromCookie = req.cookies?.token;
+  console.log({tokenFromCookie});
   const tokenFromHeader =
     req.headers["authorization"]?.split("Bearer ")[1]?.trim() ||
     req.headers.cookie?.split("=")[1]?.trim();
+  console.log({tokenFromHeader});
 
   const tokenFromHeader2 = req.headers["authorization"]
     ?.split("Bearer ")[1]
     ?.trim();
+  console.log({tokenFromHeader2});
   const token = tokenFromCookie || tokenFromHeader || tokenFromHeader2;
   if (!token) {
     return next(

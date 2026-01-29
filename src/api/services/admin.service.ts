@@ -47,6 +47,7 @@ class AdminService {
     }
 
     public static async findById(id: number){
+        if (!id) return null;
         const admin = await prisma.admin.findUnique({
             where: {
                 id

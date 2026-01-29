@@ -6,6 +6,7 @@ import EnquiryRoute from "./enquiry.routes";
 import BuyerRoute from "./buyer.routes";
 import StatsRoute from "./stats.routes";
 import QrRoute from "./qr.routes";
+import BlogRoute from "./blog.routes";
 
 export {
   AdminRoute,
@@ -16,4 +17,5 @@ export {
   BuyerRoute,
   StatsRoute,
   QrRoute,
+  BlogRoute,
 };

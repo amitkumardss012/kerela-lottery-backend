@@ -60,6 +60,8 @@ class AdminService {
     }
     static findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!id)
+                return null;
             const admin = yield config_1.prisma.admin.findUnique({
                 where: {
                     id

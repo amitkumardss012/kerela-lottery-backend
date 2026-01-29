@@ -4,7 +4,10 @@
 
   export const multerUpload = multer({
     storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { 
+      fileSize: 10 * 1024 * 1024, // 10MB for files
+      fieldSize: 10 * 1024 * 1024  // 10MB for text fields (like blog content)
+    },
     fileFilter: (_, file, cb) => {
       const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
       if (allowedMimeTypes.includes(file.mimetype)) {

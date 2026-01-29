@@ -17,9 +17,12 @@ const error_middleware_1 = require("./error.middleware");
 exports.authenticate = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g;
     const tokenFromCookie = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.token;
+    console.log({ tokenFromCookie });
     const tokenFromHeader = ((_c = (_b = req.headers["authorization"]) === null || _b === void 0 ? void 0 : _b.split("Bearer ")[1]) === null || _c === void 0 ? void 0 : _c.trim()) ||
         ((_e = (_d = req.headers.cookie) === null || _d === void 0 ? void 0 : _d.split("=")[1]) === null || _e === void 0 ? void 0 : _e.trim());
+    console.log({ tokenFromHeader });
     const tokenFromHeader2 = (_g = (_f = req.headers["authorization"]) === null || _f === void 0 ? void 0 : _f.split("Bearer ")[1]) === null || _g === void 0 ? void 0 : _g.trim();
+    console.log({ tokenFromHeader2 });
     const token = tokenFromCookie || tokenFromHeader || tokenFromHeader2;
     if (!token) {
         return next(new utils_1.ErrorResponse("Not authorized, token missing", types_1.statusCode.Unauthorized));

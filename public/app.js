@@ -51,6 +51,7 @@ app.use("/api/v1/buyer", routes_1.BuyerRoute);
 app.use("/api/v1/stats", routes_1.StatsRoute);
 app.use("/api/v1/qr", routes_1.QrRoute);
 app.use("/api/v1/web-config", webConfig_routes_1.default);
+app.use("/api/v1/blog", routes_1.BlogRoute);
 // ⛔ 404 route handler
 app.all("*", (_, res) => {
     res.status(types_1.statusCode.Bad_Request).json({

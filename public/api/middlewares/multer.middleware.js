@@ -8,7 +8,10 @@ const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.memoryStorage();
 exports.multerUpload = (0, multer_1.default)({
     storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB for files
+        fieldSize: 10 * 1024 * 1024 // 10MB for text fields (like blog content)
+    },
     fileFilter: (_, file, cb) => {
         const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
         if (allowedMimeTypes.includes(file.mimetype)) {

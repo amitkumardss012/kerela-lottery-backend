@@ -37,6 +37,8 @@ model admin {
   createdAt DateTime   @default(now())
   updatedAt DateTime
 
+  blog_posts blog_post[]
+
   @@index([email], map: "Admin_email_idx")
 }
 
@@ -150,11 +152,69 @@ model QRCode {
 }
 
 model WebConfig {
-  id             Int    @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   whatsAppNumber String?
   phoneNumber    String?
   email          String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model blog_category {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  slug      String      @unique
+  posts     blog_post[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+model blog_tag {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  slug      String      @unique
+  posts     blog_post[] @relation("BlogPostTags")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+model blog_post {
+  id             Int     @id @default(autoincrement())
+  title          String
+  slug           String  @unique
+  content        String  @db.LongText
+  summary        String? @db.Text
+  featured_image Json?
+
+  // SEO fields
+  meta_title       String?
+  meta_description String? @db.Text
+  meta_keywords    String? @db.Text
+
+  is_published Boolean   @default(false)
+  published_at DateTime?
+
+  views Int @default(0)
+
+  author_id Int
+  author    admin @relation(fields: [author_id], references: [id])
+
+  category_id Int?
+  category    blog_category? @relation(fields: [category_id], references: [id])
+
+  tags blog_tag[] @relation("BlogPostTags")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([author_id])
+  @@index([category_id])
+  @@index([is_published])
+  @@index([createdAt])
 }
