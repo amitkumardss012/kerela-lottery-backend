@@ -147,6 +147,8 @@ model QRCode {
   id        Int      @id @default(autoincrement())
   phone     String?
   image     Json?
+  upi       String?
+  
   createdAt DateTime @default(now())
   updatedAt DateTime
 }

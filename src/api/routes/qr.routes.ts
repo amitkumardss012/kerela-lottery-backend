@@ -12,10 +12,11 @@ Qr.put(
   multerUpload.single("image"),
   asyncHandler(async (req, res, next) => {
     const phone = req.body.phone;
+    const upi = req.body.upi;
     const image = req.file as Express.Multer.File;
 
-    if (!image && !phone) {
-      return next(new ErrorResponse("Either phone or image is required", statusCode.Bad_Request));
+    if (!image && !phone && !upi) {
+      return next(new ErrorResponse("Either phone or image or upi is required", statusCode.Bad_Request));
     }
 
     if (image) {
@@ -58,6 +59,9 @@ Qr.put(
         if (phone) {
           updateData.phone = phone;
         }
+        if (upi) {
+          updateData.upi = upi;
+        }
 
         // Only update image if a new image was uploaded
         if (cloudinaryResult) {
@@ -83,7 +87,8 @@ Qr.put(
         // 🔹 Step 5: If QR code doesn't exist, create a new one
         qrCode = await prisma.qRCode.create({
           data: {
-            phone: phone || "", // Default to empty string if phone is not provided
+            phone: phone || "",
+            upi: upi || "",
             image: cloudinaryResult
               ? { public_id: cloudinaryResult.public_id, secure_url: cloudinaryResult.secure_url }
               : undefined,

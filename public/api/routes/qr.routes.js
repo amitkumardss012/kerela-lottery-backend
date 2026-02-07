@@ -21,9 +21,10 @@ const cloudinary_1 = __importDefault(require("../../config/cloudinary"));
 const Qr = (0, express_1.Router)();
 Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const phone = req.body.phone;
+    const upi = req.body.upi;
     const image = req.file;
-    if (!image && !phone) {
-        return next(new response_util_1.ErrorResponse("Either phone or image is required", types_1.statusCode.Bad_Request));
+    if (!image && !phone && !upi) {
+        return next(new response_util_1.ErrorResponse("Either phone or image or upi is required", types_1.statusCode.Bad_Request));
     }
     if (image) {
         if (!image.mimetype.startsWith("image/")) {
@@ -59,6 +60,9 @@ Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asy
             if (phone) {
                 updateData.phone = phone;
             }
+            if (upi) {
+                updateData.upi = upi;
+            }
             // Only update image if a new image was uploaded
             if (cloudinaryResult) {
                 updateData.image = {
@@ -82,7 +86,8 @@ Qr.put("/add", middlewares_1.multerUpload.single("image"), (0, middlewares_1.asy
             // 🔹 Step 5: If QR code doesn't exist, create a new one
             qrCode = yield config_1.prisma.qRCode.create({
                 data: {
-                    phone: phone || "", // Default to empty string if phone is not provided
+                    phone: phone || "",
+                    upi: upi || "",
                     image: cloudinaryResult
                         ? { public_id: cloudinaryResult.public_id, secure_url: cloudinaryResult.secure_url }
                         : undefined,
