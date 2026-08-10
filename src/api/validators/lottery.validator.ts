@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 /**
  * Validator schema for Lottery entity
  * Defines validation rules for lottery-related data
@@ -29,11 +30,16 @@ const LotteryValidator = z.object({
     .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:mm"),
   
   is_active: z
-    .boolean({
+    .preprocess((val) => {
+      if (typeof val === "string") return val === "true";
+      return val;
+    }, z.boolean({
       invalid_type_error: "Active status must be a boolean",
-    })
+    }))
     .default(true)
     .optional(),
+
+  image: z.any().optional(),
 });
 
 /**
@@ -41,3 +47,4 @@ const LotteryValidator = z.object({
  */
 export default LotteryValidator;
 export type LotteryType = z.infer<typeof LotteryValidator>;
+

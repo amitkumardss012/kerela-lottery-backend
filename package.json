@@ -8,7 +8,11 @@
     "start": "node public/index.js",
     "build": "tsc",
     "dev": "concurrently \"tsc -b --watch\" \"nodemon public/index.js\"",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "seed": "node seed/admin.js"
+  },
+  "prisma": {
+    "seed": "node seed/admin.js"
   },
   "keywords": [],
   "author": "",

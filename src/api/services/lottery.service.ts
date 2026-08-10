@@ -22,7 +22,9 @@ class LotteryService {
                 result_time: true,
                 result_date: true,
                 is_active: true,
+                image: true,
                 createdAt: true,
+                updatedAt: true,
             },
             orderBy: {createdAt: "desc"}
         })
@@ -37,6 +39,9 @@ class LotteryService {
                 result_time: true,
                 result_date: true,
                 is_active: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
             },
             orderBy: {createdAt: "desc"}
         })
@@ -53,7 +58,10 @@ class LotteryService {
                 name: true,
                 result_time: true,
                 result_date: true,
-                is_active: true
+                is_active: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
             }
         })
         return lottery;

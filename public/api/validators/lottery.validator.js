@@ -28,11 +28,16 @@ const LotteryValidator = zod_1.z.object({
     })
         .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:mm"),
     is_active: zod_1.z
-        .boolean({
+        .preprocess((val) => {
+        if (typeof val === "string")
+            return val === "true";
+        return val;
+    }, zod_1.z.boolean({
         invalid_type_error: "Active status must be a boolean",
-    })
+    }))
         .default(true)
         .optional(),
+    image: zod_1.z.any().optional(),
 });
 /**
  * Export the validator schema and its inferred type

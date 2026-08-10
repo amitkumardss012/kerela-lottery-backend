@@ -15,6 +15,14 @@ class TicketPackageService {
         return __awaiter(this, void 0, void 0, function* () {
             const ticketPackage = yield config_1.prisma.ticketpackage.create({
                 data: Object.assign(Object.assign({}, data), { updatedAt: new Date() }),
+                include: {
+                    lottery: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
             });
             return ticketPackage;
         });
@@ -25,16 +33,13 @@ class TicketPackageService {
                 where: {
                     is_active: true,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    number_of_tickets: true,
-                    paid_tickets: true,
-                    free_tickets: true,
-                    price: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    is_active: true,
+                include: {
+                    lottery: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
                 },
                 orderBy: {
                     createdAt: "desc",
@@ -46,17 +51,17 @@ class TicketPackageService {
     static getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             const ticketPackages = yield config_1.prisma.ticketpackage.findMany({
-                select: {
-                    id: true,
-                    name: true,
-                    number_of_tickets: true,
-                    paid_tickets: true,
-                    free_tickets: true,
-                    price: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    is_active: true,
-                }, orderBy: { createdAt: "desc" }
+                include: {
+                    lottery: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
             });
             return ticketPackages;
         });
@@ -67,16 +72,13 @@ class TicketPackageService {
                 where: {
                     id,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    number_of_tickets: true,
-                    paid_tickets: true,
-                    free_tickets: true,
-                    price: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    is_active: true,
+                include: {
+                    lottery: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
                 },
             });
             return ticketPackage;
@@ -89,6 +91,14 @@ class TicketPackageService {
                     id,
                 },
                 data,
+                include: {
+                    lottery: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
             });
             return ticketPackage;
         });
@@ -101,6 +111,7 @@ class TicketPackageService {
                 },
                 select: {
                     id: true,
+                    image: true,
                 },
             });
             return ticketPackage;

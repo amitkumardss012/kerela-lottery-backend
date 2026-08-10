@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { TicketPackageController } from "../controllers";
 import { authenticate, isAdmin } from "../middlewares/auth.middleware";
+import { multerUpload } from "../middlewares";
 
 const ticketPackage = Router();
 
@@ -14,7 +15,11 @@ ticketPackage.get(
 ticketPackage.use(authenticate, isAdmin);
 
 // 📦 Route to create a new ticket package
-ticketPackage.post("/create", TicketPackageController.createTicketPackage);
+ticketPackage.post(
+  "/create",
+  multerUpload.single("image"),
+  TicketPackageController.createTicketPackage
+);
 
 // 📋 Get all ticket packages (including inactive ones)
 ticketPackage.get("/all", TicketPackageController.getAllTicketPackages);
@@ -25,9 +30,10 @@ ticketPackage
   // 🔍 Get ticket package by ID
   .get(TicketPackageController.getTicketPackageById)
   // ✏️ Update ticket package by ID
-  .put(TicketPackageController.updateTicketPackage)
+  .put(multerUpload.single("image"), TicketPackageController.updateTicketPackage)
   // 🗑️ Delete ticket package by ID
   .delete(TicketPackageController.deleteTicketPackage);
 
 // 📤 Export the router
 export default ticketPackage;
+

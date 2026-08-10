@@ -35,7 +35,7 @@ model admin {
   password  String
   role      admin_role @default(sub_admin)
   createdAt DateTime   @default(now())
-  updatedAt DateTime
+  updatedAt DateTime   @updatedAt
 
   blog_posts blog_post[]
 
@@ -52,7 +52,7 @@ model buyer {
   ticket_package_id  Int?
   transaction_id     String?                  @unique(map: "Buyer_transaction_id_key")
   createdAt          DateTime                 @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime                 @updatedAt
   transaction_status buyer_transaction_status @default(not_verified)
   is_read            Boolean                  @default(false)
   lottery            lottery?                 @relation(fields: [lottery_id], references: [id], map: "Buyer_lottery_id_fkey")
@@ -75,23 +75,25 @@ model enquiry {
   message   String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 
   @@index([createdAt], map: "Enquiry_createdAt_idx")
   @@index([email], map: "Enquiry_email_idx")
 }
 
 model lottery {
-  id          Int      @id @default(autoincrement())
-  name        String
-  result_time String
-  is_active   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime
-  result_date String
-  buyer       buyer[]
-  ticket      ticket[]
-  winner      winner[]
+  id            Int             @id @default(autoincrement())
+  name          String
+  result_time   String
+  is_active     Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  result_date   String
+  image         Json?
+  buyer         buyer[]
+  ticket        ticket[]
+  winner        winner[]
+  ticketpackage ticketpackage[]
 
   @@index([result_time], map: "Lottery_result_time_idx")
 }
@@ -102,7 +104,7 @@ model ticket {
   ticket_package_id Int
   ticket_number     String
   createdAt         DateTime      @default(now())
-  updatedAt         DateTime
+  updatedAt         DateTime      @updatedAt
   transaction_id    String
   buyer_id          Int
   buyer             buyer         @relation(fields: [buyer_id], references: [id], map: "Ticket_buyer_id_fkey")
@@ -115,18 +117,51 @@ model ticket {
   @@index([ticket_package_id], map: "Ticket_ticket_package_id_fkey")
 }
 
+enum package_badge {
+  POPULAR          // Badge highlighting the most popular package among buyers
+  BEST_VALUE       // Badge for packages with the best value/discount ratio
+  RECOMMENDED      // Badge for officially recommended package
+  HOT_DEAL         // Badge for high-converting deal packages
+  EXCLUSIVE        // Badge for premium exclusive ticket packages
+  LIMITED_OFFER    // Badge for time-sensitive flash offers
+}
+
 model ticketpackage {
-  id                Int      @id @default(autoincrement())
-  name              String
-  number_of_tickets Int
-  paid_tickets      Int
-  free_tickets      Int?
-  price             Float
-  is_active         Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime
-  buyer             buyer[]
-  ticket            ticket[]
+  id                   Int            @id @default(autoincrement())
+  name                 String         // Package name (e.g. "Super Saver Pack", "Mega Combo", "Gold Bundle")
+  description          String?        @db.Text // Rich description (e.g. "Buy 10 Tickets & Get 2 Bonus Tickets Free + WhatsApp Delivery")
+  badge                package_badge? // Optional badge tag: POPULAR, BEST_VALUE, RECOMMENDED, HOT_DEAL, EXCLUSIVE, LIMITED_OFFER
+  image                Json?          // Optional Cloudinary image asset object { public_id, secure_url } or URL string
+
+  // Ticket Counts
+  number_of_tickets    Int            // Total tickets delivered to buyer (e.g. 12)
+  paid_tickets         Int            // Number of paid tickets (e.g. 10)
+  free_tickets         Int?           @default(0) // Number of free bonus tickets included (e.g. 2)
+
+  // Pricing & Discounts
+  price                Float          // Selling price in INR (e.g. 400.0)
+  original_price       Float?         // Original price before discount for strikethrough UI (e.g. 500.0)
+  savings_text         String?        // Savings text badge (e.g. "Save ₹100 Instant", "20% OFF")
+
+  // Value Hooks & Perks
+  odds_multiplier_text String?        // Winning odds boost text (e.g. "10x Higher Chance of Winning", "5x Odds Boost")
+  bonus_perks          Json?          // Array of bullet perks (e.g. ["Instant PDF Receipt", "Auto Ticket Matching", "Priority Entry"])
+  valid_until          DateTime?      // Optional expiry DateTime for limited-time flash offer countdowns (e.g. 2026-12-31T23:59:59Z)
+
+  is_active            Boolean        @default(true) // Package visibility status (true = active on checkout, false = hidden)
+
+  // Relation to Lottery
+  lottery_id           Int?           // Foreign key ID of specific lottery draw (e.g. 1), or null for global package across all lotteries
+  lottery              lottery?       @relation(fields: [lottery_id], references: [id])
+
+  createdAt            DateTime       @default(now()) // Timestamp when ticket package was created
+  updatedAt            DateTime       @updatedAt // Timestamp when ticket package was last updated
+
+  buyer                buyer[]        // Relational list of buyers who purchased this ticket package
+  ticket               ticket[]       // Relational list of individual tickets generated under this package
+
+  @@index([lottery_id])
+  @@index([is_active])
 }
 
 enum admin_role {
@@ -150,7 +185,7 @@ model QRCode {
   upi       String?
   
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model WebConfig {

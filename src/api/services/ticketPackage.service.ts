@@ -8,27 +8,30 @@ class TicketPackageService {
         ...data,
         updatedAt: new Date(),
       },
+      include: {
+        lottery: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
     return ticketPackage;
   }
-
-
 
   public static async getAllActive() {
     const ticketPackages = await prisma.ticketpackage.findMany({
       where: {
         is_active: true,
       },
-      select: {
-        id: true,
-        name: true,
-        number_of_tickets: true,
-        paid_tickets: true,
-        free_tickets: true,
-        price: true,
-        createdAt: true,
-        updatedAt: true,
-        is_active: true,
+      include: {
+        lottery: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -39,17 +42,17 @@ class TicketPackageService {
 
   public static async getAll() {
     const ticketPackages = await prisma.ticketpackage.findMany({
-      select: {
-        id: true,
-        name: true,
-        number_of_tickets: true,
-        paid_tickets: true,
-        free_tickets: true,
-        price: true,
-        createdAt: true,
-        updatedAt: true,
-        is_active: true,
-      },orderBy: {createdAt: "desc"}
+      include: {
+        lottery: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     return ticketPackages;
   }
@@ -59,27 +62,32 @@ class TicketPackageService {
       where: {
         id,
       },
-      select: {
-        id: true,
-        name: true,
-        number_of_tickets: true,
-        paid_tickets: true,
-        free_tickets: true,
-        price: true,
-        createdAt: true,
-        updatedAt: true,
-        is_active: true,
+      include: {
+        lottery: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
     return ticketPackage;
   }
 
-  public static async update(id: number, data: Partial<TicketPackageService>) {
+  public static async update(id: number, data: Partial<TicketPackageType>) {
     const ticketPackage = await prisma.ticketpackage.update({
       where: {
         id,
       },
       data,
+      include: {
+        lottery: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
     return ticketPackage;
   }
@@ -91,6 +99,7 @@ class TicketPackageService {
       },
       select: {
         id: true,
+        image: true,
       },
     });
     return ticketPackage;
@@ -98,3 +107,4 @@ class TicketPackageService {
 }
 
 export default TicketPackageService;
+
