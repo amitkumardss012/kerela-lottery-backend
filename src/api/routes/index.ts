@@ -7,6 +7,7 @@ import BuyerRoute from "./buyer.routes";
 import StatsRoute from "./stats.routes";
 import QrRoute from "./qr.routes";
 import BlogRoute from "./blog.routes";
+import PackageTicketRoute from "./packageTicket.routes";
 
 export {
   AdminRoute,
@@ -18,4 +19,5 @@ export {
   StatsRoute,
   QrRoute,
   BlogRoute,
+  PackageTicketRoute,
 };

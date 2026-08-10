@@ -45,6 +45,7 @@ app.get("/", (_, res) => {
 app.use("/api/v1/admin", routes_1.AdminRoute);
 app.use("/api/v1/lottery", routes_1.LotteryRoute);
 app.use("/api/v1/ticket-package", routes_1.TicketPackageRoute);
+app.use("/api/v1/package-ticket", routes_1.PackageTicketRoute);
 app.use("/api/v1/winner", routes_1.WinnerRoute);
 app.use("/api/v1/enquiry", routes_1.EnquiryRoute);
 app.use("/api/v1/buyer", routes_1.BuyerRoute);

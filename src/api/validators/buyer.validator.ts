@@ -69,6 +69,10 @@ export const BuyerValidator = z.object({
     })
     .default(transaction_status.Not_Varified)
     .optional(),
+
+  selected_tickets: z
+    .array(z.string())
+    .optional(),
 });
 
 export default BuyerValidator;

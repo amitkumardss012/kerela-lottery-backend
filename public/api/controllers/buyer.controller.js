@@ -19,7 +19,7 @@ const response_util_1 = require("../utils/response.util");
 const validators_1 = require("../validators");
 exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const { name, phone, email, state, lottery_id, ticket_package_id, transaction_id, } = validators_1.BuyerValidator.parse(req.body);
+    const { name, phone, email, state, lottery_id, ticket_package_id, transaction_id, selected_tickets, } = validators_1.BuyerValidator.parse(req.body);
     // Check if ticket package exists
     const ticket_package = yield services_1.TicketPackageService.getById(ticket_package_id);
     if (!ticket_package) {
@@ -51,6 +51,54 @@ exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __await
     const totalTickets = ticket_package.number_of_tickets ||
         ((_a = ticket_package.paid_tickets) !== null && _a !== void 0 ? _a : 0) + ((_b = ticket_package.free_tickets) !== null && _b !== void 0 ? _b : 0) ||
         0;
+    // Process ticket numbers
+    const finalTicketNumbers = [];
+    const pregeneratedTicketIdsToMarkSold = [];
+    if (Array.isArray(selected_tickets) && selected_tickets.length > 0) {
+        // User specifically selected tickets
+        const cleanSelected = Array.from(new Set(selected_tickets.map((t) => t.trim().toUpperCase())));
+        if (cleanSelected.length !== totalTickets) {
+            return next(new utils_1.ErrorResponse(`Please select exactly ${totalTickets} ticket number(s) for this package`, types_1.statusCode.Bad_Request));
+        }
+        // Verify all selected tickets exist in package_ticket and are unsold
+        const availablePreGen = yield config_1.prisma.package_ticket.findMany({
+            where: {
+                ticket_package_id,
+                ticket_number: { in: cleanSelected },
+                is_sold: false,
+            },
+        });
+        if (availablePreGen.length !== cleanSelected.length) {
+            return next(new utils_1.ErrorResponse("Some of your selected tickets are no longer available. Please select different tickets.", types_1.statusCode.Bad_Request));
+        }
+        cleanSelected.forEach((tNum) => {
+            finalTicketNumbers.push(tNum);
+        });
+        availablePreGen.forEach((pt) => {
+            pregeneratedTicketIdsToMarkSold.push(pt.id);
+        });
+    }
+    else {
+        // Auto assignment mode: Use available pre-generated tickets first, fallback to generation
+        const availablePreGen = yield config_1.prisma.package_ticket.findMany({
+            where: {
+                ticket_package_id,
+                is_sold: false,
+            },
+            take: totalTickets,
+            orderBy: { createdAt: "asc" },
+        });
+        for (const pt of availablePreGen) {
+            finalTicketNumbers.push(pt.ticket_number);
+            pregeneratedTicketIdsToMarkSold.push(pt.id);
+        }
+        // If pre-generated tickets are fewer than required, dynamically generate the remainder
+        const remainingCount = totalTickets - finalTicketNumbers.length;
+        for (let i = 0; i < remainingCount; i++) {
+            const generatedNum = yield (0, utils_1.GenerateUniqueTicketNumber)(lottery_id);
+            finalTicketNumbers.push(generatedNum || "");
+        }
+    }
     // Create the buyer
     const buyer = yield config_1.prisma.buyer.create({
         data: {
@@ -64,25 +112,36 @@ exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __await
             updatedAt: new Date(),
         },
     });
-    // Generate and create tickets
-    const tickets = [];
-    for (let i = 0; i < totalTickets; i++) {
-        const ticketNumber = yield (0, utils_1.GenerateUniqueTicketNumber)(lottery_id);
-        tickets.push({
-            buyer_id: buyer.id,
-            lottery_id,
-            ticket_package_id,
-            ticket_number: ticketNumber || "",
-            transaction_id: transaction_id || "",
-            updatedAt: new Date(),
+    // Mark pre-generated tickets as sold
+    if (pregeneratedTicketIdsToMarkSold.length > 0) {
+        yield config_1.prisma.package_ticket.updateMany({
+            where: {
+                id: { in: pregeneratedTicketIdsToMarkSold },
+            },
+            data: {
+                is_sold: true,
+                sold_at: new Date(),
+                buyer_id: buyer.id,
+                transaction_id: transaction_id || null,
+                updatedAt: new Date(),
+            },
         });
     }
+    // Create tickets in primary ticket table for consistency & pdf generation
+    const ticketsToInsert = finalTicketNumbers.map((ticketNum) => ({
+        buyer_id: buyer.id,
+        lottery_id,
+        ticket_package_id,
+        ticket_number: ticketNum,
+        transaction_id: transaction_id || "",
+        updatedAt: new Date(),
+    }));
     yield config_1.prisma.ticket.createMany({
-        data: tickets,
+        data: ticketsToInsert,
     });
     return (0, response_util_1.SuccessResponse)(res, "Lottery bought successfully", {
         buyer,
-        tickets,
+        tickets: ticketsToInsert,
         ticket_package: ticket_package.name,
     }, types_1.statusCode.Created);
 }));

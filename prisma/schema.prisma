@@ -58,6 +58,7 @@ model buyer {
   lottery            lottery?                 @relation(fields: [lottery_id], references: [id], map: "Buyer_lottery_id_fkey")
   ticketpackage      ticketpackage?           @relation(fields: [ticket_package_id], references: [id], map: "Buyer_ticket_package_id_fkey")
   ticket             ticket[]
+  package_ticket     package_ticket[]
 
   @@index([email], map: "Buyer_email_idx")
   @@index([lottery_id], map: "Buyer_lottery_id_fkey")
@@ -94,6 +95,7 @@ model lottery {
   ticket        ticket[]
   winner        winner[]
   ticketpackage ticketpackage[]
+  package_ticket package_ticket[]
 
   @@index([result_time], map: "Lottery_result_time_idx")
 }
@@ -159,9 +161,33 @@ model ticketpackage {
 
   buyer                buyer[]        // Relational list of buyers who purchased this ticket package
   ticket               ticket[]       // Relational list of individual tickets generated under this package
+  package_ticket       package_ticket[] // Pre-generated tickets by admin for this package
 
   @@index([lottery_id])
   @@index([is_active])
+}
+
+model package_ticket {
+  id                Int           @id @default(autoincrement())
+  ticket_package_id Int
+  lottery_id        Int?
+  ticket_number     String
+  is_sold           Boolean       @default(false)
+  sold_at           DateTime?
+  buyer_id          Int?
+  transaction_id    String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  ticketpackage     ticketpackage @relation(fields: [ticket_package_id], references: [id], onDelete: Cascade)
+  lottery           lottery?      @relation(fields: [lottery_id], references: [id], onDelete: SetNull)
+  buyer             buyer?        @relation(fields: [buyer_id], references: [id], onDelete: SetNull)
+
+  @@unique([ticket_package_id, ticket_number])
+  @@index([ticket_package_id])
+  @@index([lottery_id])
+  @@index([is_sold])
+  @@index([ticket_number])
 }
 
 enum admin_role {

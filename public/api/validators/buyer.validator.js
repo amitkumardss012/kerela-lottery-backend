@@ -64,5 +64,8 @@ exports.BuyerValidator = zod_1.z.object({
     })
         .default(types_1.transaction_status.Not_Varified)
         .optional(),
+    selected_tickets: zod_1.z
+        .array(zod_1.z.string())
+        .optional(),
 });
 exports.default = exports.BuyerValidator;

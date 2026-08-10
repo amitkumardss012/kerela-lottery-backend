@@ -19,6 +19,7 @@ import {
   TicketPackageRoute,
   WinnerRoute,
   BlogRoute,
+  PackageTicketRoute,
 } from "./api/routes";
 import WebConfigRoute  from "./api/routes/webConfig.routes";
 
@@ -60,6 +61,7 @@ app.get("/", (_, res) => {
 app.use("/api/v1/admin", AdminRoute);
 app.use("/api/v1/lottery", LotteryRoute);
 app.use("/api/v1/ticket-package", TicketPackageRoute);
+app.use("/api/v1/package-ticket", PackageTicketRoute);
 app.use("/api/v1/winner", WinnerRoute);
 app.use("/api/v1/enquiry", EnquiryRoute);
 app.use("/api/v1/buyer", BuyerRoute);
