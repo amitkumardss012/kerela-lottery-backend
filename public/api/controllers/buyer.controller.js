@@ -176,7 +176,8 @@ exports.getAllBuyers = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
             include: {
                 lottery: true,
                 ticketpackage: true,
-                ticket: exportMode === 'true', // Include tickets if exportMode is enabled
+                ticket: true,
+                package_ticket: true,
             },
             orderBy: {
                 createdAt: "desc",
@@ -210,8 +211,13 @@ exports.getBuyerById = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
             ticket: {
                 where: {
                     buyer_id: id,
-                }
-            }
+                },
+            },
+            package_ticket: {
+                where: {
+                    buyer_id: id,
+                },
+            },
         },
     });
     if (!buyer) {
@@ -319,6 +325,20 @@ exports.toggleBuyerStatus = (0, middlewares_1.asyncHandler)((req, res, next) => 
     const updatedBuyer = yield config_1.prisma.buyer.update({
         where: { id },
         data: { transaction_status: updatedStatus },
+        include: {
+            lottery: true,
+            ticketpackage: true,
+            ticket: {
+                where: {
+                    buyer_id: id,
+                },
+            },
+            package_ticket: {
+                where: {
+                    buyer_id: id,
+                },
+            },
+        },
     });
     return (0, response_util_1.SuccessResponse)(res, "Buyer status updated successfully", updatedBuyer, types_1.statusCode.OK);
 }));

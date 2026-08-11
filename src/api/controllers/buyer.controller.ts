@@ -219,7 +219,8 @@ export const getAllBuyers = asyncHandler(async (req, res, next) => {
       include: {
         lottery: true,
         ticketpackage: true,
-        ticket: exportMode === 'true', // Include tickets if exportMode is enabled
+        ticket: true,
+        package_ticket: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -257,8 +258,13 @@ export const getBuyerById = asyncHandler(async (req, res, next) => {
       ticket: {
         where: {
           buyer_id: id,
-        }
-      }
+        },
+      },
+      package_ticket: {
+        where: {
+          buyer_id: id,
+        },
+      },
     },
   });
 
@@ -394,6 +400,20 @@ export const toggleBuyerStatus = asyncHandler(async (req, res, next) => {
   const updatedBuyer = await prisma.buyer.update({
     where: { id },
     data: { transaction_status: updatedStatus },
+    include: {
+      lottery: true,
+      ticketpackage: true,
+      ticket: {
+        where: {
+          buyer_id: id,
+        },
+      },
+      package_ticket: {
+        where: {
+          buyer_id: id,
+        },
+      },
+    },
   });
 
   return SuccessResponse(res, "Buyer status updated successfully", updatedBuyer, statusCode.OK);
