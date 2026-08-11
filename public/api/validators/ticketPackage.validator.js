@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
 const numberCoerce = (val) => {
+    if (val === null || val === undefined || (typeof val === "string" && val.trim() === ""))
+        return null;
     if (typeof val === "string" && val.trim() !== "") {
         const num = Number(val);
         return isNaN(num) ? val : num;
@@ -21,6 +23,7 @@ const TicketPackageValidator = zod_1.z.object({
         .trim(),
     description: zod_1.z.string().optional().nullable(),
     badge: zod_1.z
+        .preprocess((val) => (typeof val === "string" && val.trim() === "" ? null : val), zod_1.z
         .enum([
         "POPULAR",
         "BEST_VALUE",
@@ -30,7 +33,7 @@ const TicketPackageValidator = zod_1.z.object({
         "LIMITED_OFFER",
     ])
         .optional()
-        .nullable(),
+        .nullable()),
     image: zod_1.z.any().optional().nullable(),
     number_of_tickets: zod_1.z.preprocess(numberCoerce, zod_1.z.number({ required_error: "Number of tickets is required" }).min(1)),
     paid_tickets: zod_1.z.preprocess(numberCoerce, zod_1.z.number({ required_error: "Paid tickets is required" }).min(0)),

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const numberCoerce = (val: unknown) => {
+  if (val === null || val === undefined || (typeof val === "string" && val.trim() === "")) return null;
   if (typeof val === "string" && val.trim() !== "") {
     const num = Number(val);
     return isNaN(num) ? val : num;
@@ -23,16 +24,20 @@ const TicketPackageValidator = z.object({
   description: z.string().optional().nullable(),
 
   badge: z
-    .enum([
-      "POPULAR",
-      "BEST_VALUE",
-      "RECOMMENDED",
-      "HOT_DEAL",
-      "EXCLUSIVE",
-      "LIMITED_OFFER",
-    ])
-    .optional()
-    .nullable(),
+    .preprocess(
+      (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+      z
+        .enum([
+          "POPULAR",
+          "BEST_VALUE",
+          "RECOMMENDED",
+          "HOT_DEAL",
+          "EXCLUSIVE",
+          "LIMITED_OFFER",
+        ])
+        .optional()
+        .nullable()
+    ),
 
   image: z.any().optional().nullable(),
 
