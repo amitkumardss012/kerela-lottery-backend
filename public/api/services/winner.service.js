@@ -32,8 +32,9 @@ class WinnerService {
         });
     }
     static getAllWinners() {
-        return __awaiter(this, arguments, void 0, function* (page = 1, limit = 10) {
+        return __awaiter(this, arguments, void 0, function* (page = 1, limit = 10, where = {}) {
             const winners = yield config_1.prisma.winner.findMany({
+                where,
                 take: limit,
                 skip: (page - 1) * limit,
                 select: {

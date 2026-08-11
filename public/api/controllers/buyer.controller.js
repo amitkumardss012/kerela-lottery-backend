@@ -185,16 +185,14 @@ exports.getAllBuyers = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
         }),
         config_1.prisma.buyer.count({ where }),
     ]);
-    if (page > Math.ceil(totalBuyers / limit) && totalBuyers > 0) {
-        return next(new utils_1.ErrorResponse("Page not found", types_1.statusCode.Not_Found));
-    }
+    const totalPages = Math.ceil(totalBuyers / limit) || 1;
     return (0, response_util_1.SuccessResponse)(res, "Buyers fetched successfully", {
-        buyers,
+        buyers: buyers || [],
         currentPage: page,
-        totalPages: Math.ceil(totalBuyers / limit),
+        totalPages,
         totalBuyers,
-        count: buyers.length,
-        hasNextPage: page * limit < totalBuyers,
+        count: buyers ? buyers.length : 0,
+        hasNextPage: page < totalPages,
         hasPrevPage: page > 1,
     });
 }));

@@ -79,24 +79,51 @@ export const deleteWinner = asyncHandler(async (req, res, next) => {
 export const getAllWinners = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
-  const [winners, total] = await Promise.all([
-    WinnerService.getAllWinners(page, limit),
-    prisma.winner.count(),
-  ]);
-  
-  if(page > Math.ceil(total / limit) && total > 0)
-    return next(new ErrorResponse("Page not found", statusCode.Not_Found))
+  const search = ((req.query.search as string) || (req.query.query as string) || "").trim();
+  const lottery_id = req.query.lottery_id as string;
+  const claimed = req.query.claimed as string;
 
-  if (!winners)
-    return next(new ErrorResponse("No winners found", statusCode.Not_Found));
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      { ticket_number: { contains: search } },
+      { name: { contains: search } },
+      { phone: { contains: search } },
+      { email: { contains: search } },
+      { state: { contains: search } },
+    ];
+  }
+
+  if (lottery_id && lottery_id !== "all") {
+    const parsedLotteryId = Number(lottery_id);
+    if (!isNaN(parsedLotteryId)) {
+      where.lottery_id = parsedLotteryId;
+    }
+  }
+
+  if (claimed && claimed !== "all") {
+    if (claimed === "claimed" || claimed === "true") {
+      where.claimed = true;
+    } else if (claimed === "pending" || claimed === "false") {
+      where.claimed = false;
+    }
+  }
+
+  const [winners, total] = await Promise.all([
+    WinnerService.getAllWinners(page, limit, where),
+    prisma.winner.count({ where }),
+  ]);
+
+  const totalPage = Math.ceil(total / limit) || 1;
 
   return SuccessResponse(res, "Winners fetched successfully", {
-    winners,
+    winners: winners || [],
     currentPage: page,
-    totalPage: Math.ceil(total / limit),
+    totalPage,
     totalWinners: total,
-    count: winners.length,
-    hasNextPage: page * limit < total,
+    count: winners ? winners.length : 0,
+    hasNextPage: page < totalPage,
     hasPrevPage: page > 1,
   });
 });

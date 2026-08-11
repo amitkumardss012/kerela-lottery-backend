@@ -14,8 +14,9 @@ class WinnerService {
     return winner;
   }
 
-  public static async getAllWinners(page: number = 1, limit: number = 10) {
+  public static async getAllWinners(page: number = 1, limit: number = 10, where: any = {}) {
     const winners = await prisma.winner.findMany({
+      where,
       take: limit,
       skip: (page - 1) * limit,
       select: {

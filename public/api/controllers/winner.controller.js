@@ -64,21 +64,45 @@ exports.deleteWinner = (0, middlewares_1.asyncHandler)((req, res, next) => __awa
 exports.getAllWinners = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
+    const search = (req.query.search || req.query.query || "").trim();
+    const lottery_id = req.query.lottery_id;
+    const claimed = req.query.claimed;
+    const where = {};
+    if (search) {
+        where.OR = [
+            { ticket_number: { contains: search } },
+            { name: { contains: search } },
+            { phone: { contains: search } },
+            { email: { contains: search } },
+            { state: { contains: search } },
+        ];
+    }
+    if (lottery_id && lottery_id !== "all") {
+        const parsedLotteryId = Number(lottery_id);
+        if (!isNaN(parsedLotteryId)) {
+            where.lottery_id = parsedLotteryId;
+        }
+    }
+    if (claimed && claimed !== "all") {
+        if (claimed === "claimed" || claimed === "true") {
+            where.claimed = true;
+        }
+        else if (claimed === "pending" || claimed === "false") {
+            where.claimed = false;
+        }
+    }
     const [winners, total] = yield Promise.all([
-        services_1.WinnerService.getAllWinners(page, limit),
-        config_1.prisma.winner.count(),
+        services_1.WinnerService.getAllWinners(page, limit, where),
+        config_1.prisma.winner.count({ where }),
     ]);
-    if (page > Math.ceil(total / limit) && total > 0)
-        return next(new response_util_1.ErrorResponse("Page not found", types_1.statusCode.Not_Found));
-    if (!winners)
-        return next(new response_util_1.ErrorResponse("No winners found", types_1.statusCode.Not_Found));
+    const totalPage = Math.ceil(total / limit) || 1;
     return (0, response_util_1.SuccessResponse)(res, "Winners fetched successfully", {
-        winners,
+        winners: winners || [],
         currentPage: page,
-        totalPage: Math.ceil(total / limit),
+        totalPage,
         totalWinners: total,
-        count: winners.length,
-        hasNextPage: page * limit < total,
+        count: winners ? winners.length : 0,
+        hasNextPage: page < totalPage,
         hasPrevPage: page > 1,
     });
 }));
