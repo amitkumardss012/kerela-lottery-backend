@@ -38,6 +38,7 @@ model admin {
   updatedAt DateTime   @updatedAt
 
   blog_posts blog_post[]
+  assigned_leads lead_customer[] @relation("AssignedSubAdminLeads")
 
   @@index([email], map: "Admin_email_idx")
 }
@@ -83,21 +84,22 @@ model enquiry {
 }
 
 model lottery {
-  id            Int             @id @default(autoincrement())
-  name          String
-  result_time   String
-  is_active     Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  result_date   String
-  image         Json?
-  buyer         buyer[]
-  ticket        ticket[]
-  winner        winner[]
-  ticketpackage ticketpackage[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  result_time    String
+  is_active      Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  result_date    String
+  image          Json?
+  buyer          buyer[]
+  ticket         ticket[]
+  winner         winner[]
+  ticketpackage  ticketpackage[]
   package_ticket package_ticket[]
 
   @@index([result_time], map: "Lottery_result_time_idx")
+  leadSubmissions lead_submission[]
 }
 
 model ticket {
@@ -120,68 +122,69 @@ model ticket {
 }
 
 enum package_badge {
-  POPULAR          // Badge highlighting the most popular package among buyers
-  BEST_VALUE       // Badge for packages with the best value/discount ratio
-  RECOMMENDED      // Badge for officially recommended package
-  HOT_DEAL         // Badge for high-converting deal packages
-  EXCLUSIVE        // Badge for premium exclusive ticket packages
-  LIMITED_OFFER    // Badge for time-sensitive flash offers
+  POPULAR // Badge highlighting the most popular package among buyers
+  BEST_VALUE // Badge for packages with the best value/discount ratio
+  RECOMMENDED // Badge for officially recommended package
+  HOT_DEAL // Badge for high-converting deal packages
+  EXCLUSIVE // Badge for premium exclusive ticket packages
+  LIMITED_OFFER // Badge for time-sensitive flash offers
 }
 
 model ticketpackage {
-  id                   Int            @id @default(autoincrement())
-  name                 String         // Package name (e.g. "Super Saver Pack", "Mega Combo", "Gold Bundle")
-  description          String?        @db.Text // Rich description (e.g. "Buy 10 Tickets & Get 2 Bonus Tickets Free + WhatsApp Delivery")
-  badge                package_badge? // Optional badge tag: POPULAR, BEST_VALUE, RECOMMENDED, HOT_DEAL, EXCLUSIVE, LIMITED_OFFER
-  image                Json?          // Optional Cloudinary image asset object { public_id, secure_url } or URL string
+  id          Int            @id @default(autoincrement())
+  name        String // Package name (e.g. "Super Saver Pack", "Mega Combo", "Gold Bundle")
+  description String?        @db.Text // Rich description (e.g. "Buy 10 Tickets & Get 2 Bonus Tickets Free + WhatsApp Delivery")
+  badge       package_badge? // Optional badge tag: POPULAR, BEST_VALUE, RECOMMENDED, HOT_DEAL, EXCLUSIVE, LIMITED_OFFER
+  image       Json? // Optional Cloudinary image asset object { public_id, secure_url } or URL string
 
   // Ticket Counts
-  number_of_tickets    Int            // Total tickets delivered to buyer (e.g. 12)
-  paid_tickets         Int            // Number of paid tickets (e.g. 10)
-  free_tickets         Int?           @default(0) // Number of free bonus tickets included (e.g. 2)
+  number_of_tickets Int // Total tickets delivered to buyer (e.g. 12)
+  paid_tickets      Int // Number of paid tickets (e.g. 10)
+  free_tickets      Int? @default(0) // Number of free bonus tickets included (e.g. 2)
 
   // Pricing & Discounts
-  price                Float          // Selling price in INR (e.g. 400.0)
-  original_price       Float?         // Original price before discount for strikethrough UI (e.g. 500.0)
-  savings_text         String?        // Savings text badge (e.g. "Save ₹100 Instant", "20% OFF")
+  price          Float // Selling price in INR (e.g. 400.0)
+  original_price Float? // Original price before discount for strikethrough UI (e.g. 500.0)
+  savings_text   String? // Savings text badge (e.g. "Save ₹100 Instant", "20% OFF")
 
   // Value Hooks & Perks
-  odds_multiplier_text String?        // Winning odds boost text (e.g. "10x Higher Chance of Winning", "5x Odds Boost")
-  bonus_perks          Json?          // Array of bullet perks (e.g. ["Instant PDF Receipt", "Auto Ticket Matching", "Priority Entry"])
-  valid_until          DateTime?      // Optional expiry DateTime for limited-time flash offer countdowns (e.g. 2026-12-31T23:59:59Z)
+  odds_multiplier_text String? // Winning odds boost text (e.g. "10x Higher Chance of Winning", "5x Odds Boost")
+  bonus_perks          Json? // Array of bullet perks (e.g. ["Instant PDF Receipt", "Auto Ticket Matching", "Priority Entry"])
+  valid_until          DateTime? // Optional expiry DateTime for limited-time flash offer countdowns (e.g. 2026-12-31T23:59:59Z)
 
-  is_active            Boolean        @default(true) // Package visibility status (true = active on checkout, false = hidden)
+  is_active Boolean @default(true) // Package visibility status (true = active on checkout, false = hidden)
 
   // Relation to Lottery
-  lottery_id           Int?           // Foreign key ID of specific lottery draw (e.g. 1), or null for global package across all lotteries
-  lottery              lottery?       @relation(fields: [lottery_id], references: [id])
+  lottery_id Int? // Foreign key ID of specific lottery draw (e.g. 1), or null for global package across all lotteries
+  lottery    lottery? @relation(fields: [lottery_id], references: [id])
 
-  createdAt            DateTime       @default(now()) // Timestamp when ticket package was created
-  updatedAt            DateTime       @updatedAt // Timestamp when ticket package was last updated
+  createdAt DateTime @default(now()) // Timestamp when ticket package was created
+  updatedAt DateTime @updatedAt // Timestamp when ticket package was last updated
 
-  buyer                buyer[]        // Relational list of buyers who purchased this ticket package
-  ticket               ticket[]       // Relational list of individual tickets generated under this package
-  package_ticket       package_ticket[] // Pre-generated tickets by admin for this package
+  buyer          buyer[] // Relational list of buyers who purchased this ticket package
+  ticket         ticket[] // Relational list of individual tickets generated under this package
+  package_ticket package_ticket[] // Pre-generated tickets by admin for this package
 
   @@index([lottery_id])
   @@index([is_active])
+  leadSubmissions lead_submission[]
 }
 
 model package_ticket {
-  id                Int           @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   ticket_package_id Int
   lottery_id        Int?
   ticket_number     String
-  is_sold           Boolean       @default(false)
+  is_sold           Boolean   @default(false)
   sold_at           DateTime?
   buyer_id          Int?
   transaction_id    String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  ticketpackage     ticketpackage @relation(fields: [ticket_package_id], references: [id], onDelete: Cascade)
-  lottery           lottery?      @relation(fields: [lottery_id], references: [id], onDelete: SetNull)
-  buyer             buyer?        @relation(fields: [buyer_id], references: [id], onDelete: SetNull)
+  ticketpackage ticketpackage @relation(fields: [ticket_package_id], references: [id], onDelete: Cascade)
+  lottery       lottery?      @relation(fields: [lottery_id], references: [id], onDelete: SetNull)
+  buyer         buyer?        @relation(fields: [buyer_id], references: [id], onDelete: SetNull)
 
   @@unique([ticket_package_id, ticket_number])
   @@index([ticket_package_id])
@@ -205,11 +208,11 @@ enum buyer_transaction_status {
 }
 
 model QRCode {
-  id        Int      @id @default(autoincrement())
-  phone     String?
-  image     Json?
-  upi       String?
-  
+  id    Int     @id @default(autoincrement())
+  phone String?
+  image Json?
+  upi   String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -219,6 +222,12 @@ model WebConfig {
   whatsAppNumber String?
   phoneNumber    String?
   email          String?
+
+  bankName       String?
+  upiNumber      String?
+  accountNumber  String?
+  ifscCode       String?
+  helpLineNumber String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -281,3 +290,72 @@ model blog_post {
   @@index([is_published])
   @@index([createdAt])
 }
+
+enum lead_status {
+  NEW
+  CONTACTED
+  PAYMENT_PENDING
+  VERIFIED
+  CONVERTED
+  REJECTED
+  LOST
+}
+
+enum lead_submission_status {
+  FORM_SUBMITTED
+  TRANSACTION_ENTERED
+  COMPLETED
+  ABANDONED
+}
+
+model lead_customer {
+  id                    Int               @id @default(autoincrement())
+  phone                 String            @unique(map: "LeadCustomer_phone_key")
+  name                  String
+  email                 String?
+  state                 String?
+  city                  String?
+  
+  total_submissions     Int               @default(1)
+  status                lead_status       @default(NEW)
+  notes                 String?           @db.Text
+  latest_submission_at  DateTime          @default(now())
+  
+  assigned_sub_admin_id Int?
+  assigned_sub_admin    admin?            @relation("AssignedSubAdminLeads", fields: [assigned_sub_admin_id], references: [id], onDelete: SetNull)
+  
+  submissions           lead_submission[]
+  
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@index([phone], map: "LeadCustomer_phone_idx")
+  @@index([status], map: "LeadCustomer_status_idx")
+  @@index([assigned_sub_admin_id], map: "LeadCustomer_assigned_sub_admin_id_idx")
+  @@index([latest_submission_at], map: "LeadCustomer_latest_submission_at_idx")
+}
+
+
+model lead_submission {
+  id                Int                    @id @default(autoincrement())
+  lead_customer_id  Int
+  lead_customer     lead_customer          @relation(fields: [lead_customer_id], references: [id], onDelete: Cascade)
+  
+  lottery_id        Int?
+  lottery           lottery?               @relation(fields: [lottery_id], references: [id], onDelete: SetNull)
+  
+  ticket_package_id Int?
+  ticketpackage     ticketpackage?         @relation(fields: [ticket_package_id], references: [id], onDelete: SetNull)
+  
+  selected_tickets  Json?
+  transaction_id    String?
+  step_reached      Int                    @default(1)
+  status            lead_submission_status @default(FORM_SUBMITTED)
+  
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  @@index([lead_customer_id], map: "LeadSubmission_lead_customer_id_idx")
+  @@index([transaction_id], map: "LeadSubmission_transaction_id_idx")
+}
+

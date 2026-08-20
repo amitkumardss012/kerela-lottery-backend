@@ -25,21 +25,21 @@ export const BuyLottery = asyncHandler(async (req, res, next) => {
   }
 
   // Check if a buyer with the same email and phone has already bought this lottery
-  const existingBuyerSameLottery = await prisma.buyer.findFirst({
-    where: {
-      email,
-      phone,
-      lottery_id,
-    },
-  });
-  if (existingBuyerSameLottery) {
-    return next(
-      new ErrorResponse(
-        "You have already bought this lottery with this email and phone",
-        statusCode.Bad_Request
-      )
-    );
-  }
+  // const existingBuyerSameLottery = await prisma.buyer.findFirst({
+  //   where: {
+  //     email,
+  //     phone,
+  //     lottery_id,
+  //   },
+  // });
+  // if (existingBuyerSameLottery) {
+  //   return next(
+  //     new ErrorResponse(
+  //       "You have already bought this lottery with this email and phone",
+  //       statusCode.Bad_Request
+  //     )
+  //   );
+  // }
 
   // Check if the transaction_id is already used for any lottery
   if (transaction_id) {
@@ -173,12 +173,67 @@ export const BuyLottery = asyncHandler(async (req, res, next) => {
     data: ticketsToInsert,
   });
 
+  // Sync Lead Management CRM: mark lead customer as CONVERTED and submission as COMPLETED
+  try {
+    const leadCustomer = await prisma.lead_customer.findUnique({
+      where: { phone },
+      include: {
+        submissions: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    const now = new Date();
+
+    if (leadCustomer) {
+      await prisma.lead_customer.update({
+        where: { id: leadCustomer.id },
+        data: {
+          latest_submission_at: now,
+          updatedAt: now,
+        },
+      });
+
+
+      if (leadCustomer.submissions.length > 0) {
+        await prisma.lead_submission.update({
+          where: { id: leadCustomer.submissions[0].id },
+          data: {
+            status: "COMPLETED",
+            step_reached: 3,
+            transaction_id: transaction_id || leadCustomer.submissions[0].transaction_id,
+            updatedAt: now,
+          },
+        });
+      } else {
+        await prisma.lead_submission.create({
+          data: {
+            lead_customer_id: leadCustomer.id,
+            lottery_id: lottery_id || null,
+            ticket_package_id: ticket_package_id || null,
+            selected_tickets: finalTicketNumbers,
+            transaction_id: transaction_id || null,
+            step_reached: 3,
+            status: "COMPLETED",
+            createdAt: now,
+            updatedAt: now,
+          },
+        });
+      }
+    }
+  } catch (leadSyncErr) {
+    console.error("Lead CRM conversion sync error:", leadSyncErr);
+  }
+
   return SuccessResponse(res, "Lottery bought successfully", {
     buyer,
     tickets: ticketsToInsert,
     ticket_package: ticket_package.name,
   }, statusCode.Created);
 });
+
 
 export const getAllBuyers = asyncHandler(async (req, res, next) => {
   const page = Number(req.query.page) || 1;

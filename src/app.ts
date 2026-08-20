@@ -20,6 +20,7 @@ import {
   WinnerRoute,
   BlogRoute,
   PackageTicketRoute,
+  LeadRoute,
 } from "./api/routes";
 import WebConfigRoute  from "./api/routes/webConfig.routes";
 
@@ -69,6 +70,8 @@ app.use("/api/v1/stats", StatsRoute);
 app.use("/api/v1/qr", QrRoute)
 app.use("/api/v1/web-config", WebConfigRoute)
 app.use("/api/v1/blog", BlogRoute)
+app.use("/api/v1/lead", LeadRoute)
+
 
 // ⛔ 404 route handler
 app.all("*", (_, res) => {

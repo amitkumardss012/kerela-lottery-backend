@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PackageTicketController = exports.BuyerController = exports.EnquiryController = exports.WinnerController = exports.TicketPackageController = exports.LotteryController = exports.AdminController = void 0;
+exports.LeadController = exports.PackageTicketController = exports.BuyerController = exports.EnquiryController = exports.WinnerController = exports.TicketPackageController = exports.LotteryController = exports.AdminController = void 0;
 const AdminController = __importStar(require("./admin.controller"));
 exports.AdminController = AdminController;
 const LotteryController = __importStar(require("./lottery.controller"));
@@ -48,3 +48,5 @@ const BuyerController = __importStar(require("./buyer.controller"));
 exports.BuyerController = BuyerController;
 const PackageTicketController = __importStar(require("./packageTicket.controller"));
 exports.PackageTicketController = PackageTicketController;
+const LeadController = __importStar(require("./lead.controller"));
+exports.LeadController = LeadController;

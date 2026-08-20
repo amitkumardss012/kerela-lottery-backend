@@ -8,6 +8,7 @@ import StatsRoute from "./stats.routes";
 import QrRoute from "./qr.routes";
 import BlogRoute from "./blog.routes";
 import PackageTicketRoute from "./packageTicket.routes";
+import LeadRoute from "./lead.routes";
 
 export {
   AdminRoute,
@@ -20,4 +21,6 @@ export {
   QrRoute,
   BlogRoute,
   PackageTicketRoute,
+  LeadRoute,
 };
+
