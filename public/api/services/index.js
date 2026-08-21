@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PackageTicketService = exports.WinnerService = exports.TicketPackageService = exports.LotteryService = exports.AdminService = void 0;
+exports.EmailService = exports.PackageTicketService = exports.WinnerService = exports.TicketPackageService = exports.LotteryService = exports.AdminService = void 0;
 const admin_service_1 = __importDefault(require("./admin.service"));
 exports.AdminService = admin_service_1.default;
 const lottery_service_1 = __importDefault(require("./lottery.service"));
@@ -14,3 +14,5 @@ const winner_service_1 = __importDefault(require("./winner.service"));
 exports.WinnerService = winner_service_1.default;
 const packageTicket_service_1 = __importDefault(require("./packageTicket.service"));
 exports.PackageTicketService = packageTicket_service_1.default;
+const email_service_1 = __importDefault(require("./email.service"));
+exports.EmailService = email_service_1.default;

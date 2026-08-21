@@ -3,6 +3,7 @@ import { ENV, prisma } from "./config";
 
 const PORT = process.env.PORT || 4000;
 
+
 const server = app.listen(ENV.PORT, () => {
   console.log(`
         🖥️  SERVER STARTED 🚀  

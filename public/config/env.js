@@ -14,6 +14,12 @@ const ENV = {
     cloud_name: process.env.CLOUD_NAME,
     cloud_api_key: process.env.CLOUD_API_KEY,
     cloud_api_secret: process.env.CLOUD_API_SECRET,
-    cloud_folder: process.env.CLOUD_FOLDER
+    cloud_folder: process.env.CLOUD_FOLDER,
+    // Smtp
+    smtp_host: process.env.SMTP_HOST,
+    smtp_port: process.env.SMTP_PORT,
+    smtp_user: process.env.SMTP_USER,
+    smtp_pass: process.env.SMTP_PASSWORD,
+    smtp_from: process.env.SMTP_FROM
 };
 exports.default = ENV;

@@ -3,7 +3,7 @@ import LotteryService from "./lottery.service";
 import TicketPackageService from "./ticketPackage.service";
 import WinnerService from "./winner.service";
 import PackageTicketService from "./packageTicket.service";
-// import BuyerService from "./buyer.service";
+import EmailService from "./email.service";
 
 export {
   AdminService,
@@ -11,5 +11,5 @@ export {
   TicketPackageService,
   WinnerService,
   PackageTicketService,
-  // BuyerService,
+  EmailService,
 };

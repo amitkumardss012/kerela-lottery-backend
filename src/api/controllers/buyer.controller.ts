@@ -1,10 +1,11 @@
 import { prisma } from "../../config";
 import { asyncHandler } from "../middlewares";
-import { TicketPackageService } from "../services";
+import { TicketPackageService, EmailService } from "../services";
 import { statusCode } from "../types/types";
 import { ErrorResponse, GenerateUniqueTicketNumber } from "../utils";
 import { SuccessResponse } from "../utils/response.util";
 import { BuyerValidator } from "../validators";
+
 
 export const BuyLottery = asyncHandler(async (req, res, next) => {
   const {
@@ -428,10 +429,15 @@ export const updateBuyerStatus = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Buyer not found", statusCode.Not_Found));
   }
 
+  // Automatically trigger ticket details email when marked as verified
+  if (transaction_status === 'verified') {
+    EmailService.sendTicketDetailsEmail(id).catch((err) => {
+      console.error(`[EmailService] Failed to send email to buyer #${id}:`, err);
+    });
+  }
+
   return SuccessResponse(res, "Buyer status updated successfully", buyer, statusCode.OK);
 });
-
-
 
 export const toggleBuyerStatus = asyncHandler(async (req, res, next) => {
   const id = Number(req.params.id);
@@ -469,5 +475,48 @@ export const toggleBuyerStatus = asyncHandler(async (req, res, next) => {
     },
   });
 
+  // Automatically trigger ticket details email when toggled to verified
+  if (updatedStatus === 'verified') {
+    EmailService.sendTicketDetailsEmail(id).catch((err) => {
+      console.error(`[EmailService] Failed to send email to buyer #${id}:`, err);
+    });
+  }
+
   return SuccessResponse(res, "Buyer status updated successfully", updatedBuyer, statusCode.OK);
 });
+
+// Single unified endpoint to send ticket details email (used both for admin verification and future user-side purchases)
+export const send_ticket_details = asyncHandler(async (req, res, next) => {
+  const buyerId = Number(
+    req.body.buyer_id ||
+      req.body.buyerId ||
+      req.body.id ||
+      req.query.buyer_id ||
+      req.params.id
+  );
+
+  if (!buyerId || isNaN(buyerId)) {
+    return next(
+      new ErrorResponse("Please provide a valid buyer_id", statusCode.Bad_Request)
+    );
+  }
+
+  try {
+    const result = await EmailService.sendTicketDetailsEmail(buyerId);
+    return SuccessResponse(
+      res,
+      "Ticket details email sent successfully",
+      result,
+      statusCode.OK
+    );
+  } catch (error: any) {
+    console.error("[send_ticket_details] Error:", error);
+    return next(
+      new ErrorResponse(
+        error.message || "Failed to send ticket details email",
+        statusCode.Internal_Server_Error
+      )
+    );
+  }
+});
+
