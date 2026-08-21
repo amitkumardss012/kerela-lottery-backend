@@ -4,40 +4,68 @@ import { ErrorResponse } from "../utils";
 import { SuccessResponse } from "../utils/response.util";
 
 export const updateWebConfig = asyncHandler(async (req, res, next) => {
-    const { whatsAppNumber, phoneNumber, email } = req.body;
+    const {
+        whatsAppNumber,
+        phoneNumber,
+        email,
+        bankName,
+        upiNumber,
+        accountNumber,
+        ifscCode,
+        helpLineNumber,
+    } = req.body;
 
-    if (!whatsAppNumber && !phoneNumber && !email) {
-        return next(new ErrorResponse("At least one field is required", 400))
+    if (
+        !whatsAppNumber &&
+        !phoneNumber &&
+        !email &&
+        !bankName &&
+        !upiNumber &&
+        !accountNumber &&
+        !ifscCode &&
+        !helpLineNumber
+    ) {
+        return next(new ErrorResponse("At least one field is required", 400));
     }
 
-    let webConfig = await prisma.webConfig.findFirst()
+    let webConfig = await prisma.webConfig.findFirst();
 
     if (webConfig) {
         webConfig = await prisma.webConfig.update({
             where: {
-                id: webConfig.id
+                id: webConfig.id,
             },
             data: {
                 whatsAppNumber,
                 phoneNumber,
-                email
-            }
-        })
+                email,
+                bankName,
+                upiNumber,
+                accountNumber,
+                ifscCode,
+                helpLineNumber,
+            },
+        });
     } else {
         webConfig = await prisma.webConfig.create({
             data: {
                 whatsAppNumber,
                 phoneNumber,
                 email,
-                updatedAt: new Date()
-            }
-        })
+                bankName,
+                upiNumber,
+                accountNumber,
+                ifscCode,
+                helpLineNumber,
+                updatedAt: new Date(),
+            },
+        });
     }
 
-    return SuccessResponse(res, "Web Config updated successfully", webConfig)
-})
+    return SuccessResponse(res, "Web Config updated successfully", webConfig);
+});
 
 export const getWebConfig = asyncHandler(async (req, res, next) => {
-    const webConfig = await prisma.webConfig.findFirst()
-    return SuccessResponse(res, "Web Config fetched successfully", webConfig)
-})
+    const webConfig = await prisma.webConfig.findFirst();
+    return SuccessResponse(res, "Web Config fetched successfully", webConfig);
+});

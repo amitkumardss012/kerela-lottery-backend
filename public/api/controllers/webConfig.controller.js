@@ -15,21 +15,33 @@ const middlewares_1 = require("../middlewares");
 const utils_1 = require("../utils");
 const response_util_1 = require("../utils/response.util");
 exports.updateWebConfig = (0, middlewares_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { whatsAppNumber, phoneNumber, email } = req.body;
-    if (!whatsAppNumber && !phoneNumber && !email) {
+    const { whatsAppNumber, phoneNumber, email, bankName, upiNumber, accountNumber, ifscCode, helpLineNumber, } = req.body;
+    if (!whatsAppNumber &&
+        !phoneNumber &&
+        !email &&
+        !bankName &&
+        !upiNumber &&
+        !accountNumber &&
+        !ifscCode &&
+        !helpLineNumber) {
         return next(new utils_1.ErrorResponse("At least one field is required", 400));
     }
     let webConfig = yield config_1.prisma.webConfig.findFirst();
     if (webConfig) {
         webConfig = yield config_1.prisma.webConfig.update({
             where: {
-                id: webConfig.id
+                id: webConfig.id,
             },
             data: {
                 whatsAppNumber,
                 phoneNumber,
-                email
-            }
+                email,
+                bankName,
+                upiNumber,
+                accountNumber,
+                ifscCode,
+                helpLineNumber,
+            },
         });
     }
     else {
@@ -38,8 +50,13 @@ exports.updateWebConfig = (0, middlewares_1.asyncHandler)((req, res, next) => __
                 whatsAppNumber,
                 phoneNumber,
                 email,
-                updatedAt: new Date()
-            }
+                bankName,
+                upiNumber,
+                accountNumber,
+                ifscCode,
+                helpLineNumber,
+                updatedAt: new Date(),
+            },
         });
     }
     return (0, response_util_1.SuccessResponse)(res, "Web Config updated successfully", webConfig);
