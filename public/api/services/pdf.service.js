@@ -74,7 +74,7 @@ class PDFService {
                 ticketNumbers.push(`KL-${buyer.id}-T1`);
             }
             const templatePath = this.getTemplatePath();
-            const templateBytes = fs_1.default.readFileSync(templatePath);
+            const templateBytes = new Uint8Array(fs_1.default.readFileSync(templatePath));
             const templateDoc = yield pdf_lib_1.PDFDocument.load(templateBytes);
             const outputDoc = yield pdf_lib_1.PDFDocument.create();
             const fontBold = yield outputDoc.embedFont(pdf_lib_1.StandardFonts.HelveticaBold);
@@ -276,7 +276,7 @@ class PDFService {
                     light: "#ffffff",
                 },
             });
-            const embeddedQrImage = yield outputDoc.embedPng(qrPngBuffer);
+            const embeddedQrImage = yield outputDoc.embedPng(new Uint8Array(qrPngBuffer));
             // Embed Page 2 of template as a reusable voucher
             const [embeddedTicketPage] = yield outputDoc.embedPages([templateDoc.getPage(1)]);
             for (let p = 0; p < ticketPagesCount; p++) {

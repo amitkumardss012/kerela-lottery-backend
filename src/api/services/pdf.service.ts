@@ -68,7 +68,7 @@ export class PDFService {
     }
 
     const templatePath = this.getTemplatePath();
-    const templateBytes = fs.readFileSync(templatePath);
+    const templateBytes = new Uint8Array(fs.readFileSync(templatePath));
     const templateDoc = await PDFDocument.load(templateBytes);
 
     const outputDoc = await PDFDocument.create();
@@ -299,7 +299,7 @@ export class PDFService {
         light: "#ffffff",
       },
     });
-    const embeddedQrImage = await outputDoc.embedPng(qrPngBuffer);
+    const embeddedQrImage = await outputDoc.embedPng(new Uint8Array(qrPngBuffer));
 
     // Embed Page 2 of template as a reusable voucher
     const [embeddedTicketPage] = await outputDoc.embedPages([templateDoc.getPage(1)]);
