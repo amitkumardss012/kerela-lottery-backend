@@ -1,6 +1,7 @@
 import { prisma } from "../../config";
 import { asyncHandler } from "../middlewares";
-import { TicketPackageService, EmailService } from "../services";
+import { TicketPackageService, EmailService, TelegramService } from "../services";
+
 import { statusCode } from "../types/types";
 import { ErrorResponse, GenerateUniqueTicketNumber } from "../utils";
 import { SuccessResponse } from "../utils/response.util";
@@ -228,12 +229,18 @@ export const BuyLottery = asyncHandler(async (req, res, next) => {
     console.error("Lead CRM conversion sync error:", leadSyncErr);
   }
 
+  // Send real-time purchase notification to Telegram channel/group
+  TelegramService.sendPurchaseNotification(buyer.id).catch((telegramErr) => {
+    console.error(`[BuyLottery] Telegram notification error for buyer #${buyer.id}:`, telegramErr);
+  });
+
   return SuccessResponse(res, "Lottery bought successfully", {
     buyer,
     tickets: ticketsToInsert,
     ticket_package: ticket_package.name,
   }, statusCode.Created);
 });
+
 
 
 export const getAllBuyers = asyncHandler(async (req, res, next) => {

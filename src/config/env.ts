@@ -20,7 +20,10 @@ const ENV = {
     smtp_port: process.env.SMTP_PORT,
     smtp_user: process.env.SMTP_USER,
     smtp_pass: process.env.SMTP_PASSWORD,
-    smtp_from: process.env.SMTP_FROM
+    smtp_from: process.env.SMTP_FROM,
+
+    telegram_bot_token: process.env.TELEGRAM_BOT_TOKEN,
+    telegram_chat_id: process.env.TELEGRAM_CHAT_ID,
 }
 
 export default ENV;

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = require("../../config");
+const pdf_service_1 = __importDefault(require("./pdf.service"));
 class EmailService {
     static getTransporter() {
         return nodemailer_1.default.createTransport({
@@ -208,13 +209,29 @@ class EmailService {
 </body>
 </html>
     `;
+            // Generate dynamic ticket PDF attachment with QR codes
+            const attachments = [];
+            try {
+                console.log(`[EmailService] Generating dynamic ticket PDF for Buyer #${buyer.id}...`);
+                const pdfBuffer = yield pdf_service_1.default.generateTicketPDF(buyer.id);
+                attachments.push({
+                    filename: `Kerala_Mega_Lottery_Tickets_${buyer.id}.pdf`,
+                    content: pdfBuffer,
+                    contentType: "application/pdf",
+                });
+                console.log(`[EmailService] Dynamic PDF generated successfully (${pdfBuffer.length} bytes)`);
+            }
+            catch (pdfErr) {
+                console.error(`[EmailService] Error generating PDF attachment for Buyer #${buyer.id}:`, pdfErr);
+            }
             const mailOptions = {
                 from: config_1.ENV.smtp_from || `"Mega Kerala Lottery" <${config_1.ENV.smtp_user}>`,
                 to: buyer.email,
                 subject: `🎉 Ticket Details Confirmed - ${lotteryName} (#${buyer.id})`,
                 html: htmlContent,
+                attachments,
             };
-            console.log(`[EmailService] Sending ticket details email to ${buyer.email} for Buyer #${buyer.id}...`);
+            console.log(`[EmailService] Sending ticket details email with PDF attachment to ${buyer.email} for Buyer #${buyer.id}...`);
             const info = yield transporter.sendMail(mailOptions);
             console.log(`[EmailService] Email sent successfully: ${info.messageId}`);
             return {

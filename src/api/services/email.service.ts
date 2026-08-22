@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { ENV, prisma } from "../../config";
+import PDFService from "./pdf.service";
 
 class EmailService {
   private static getTransporter() {
@@ -206,14 +207,30 @@ class EmailService {
 </html>
     `;
 
-    const mailOptions = {
+    // Generate dynamic ticket PDF attachment with QR codes
+    const attachments: any[] = [];
+    try {
+      console.log(`[EmailService] Generating dynamic ticket PDF for Buyer #${buyer.id}...`);
+      const pdfBuffer = await PDFService.generateTicketPDF(buyer.id);
+      attachments.push({
+        filename: `Kerala_Mega_Lottery_Tickets_${buyer.id}.pdf`,
+        content: pdfBuffer,
+        contentType: "application/pdf",
+      });
+      console.log(`[EmailService] Dynamic PDF generated successfully (${pdfBuffer.length} bytes)`);
+    } catch (pdfErr) {
+      console.error(`[EmailService] Error generating PDF attachment for Buyer #${buyer.id}:`, pdfErr);
+    }
+
+    const mailOptions: any = {
       from: ENV.smtp_from || `"Mega Kerala Lottery" <${ENV.smtp_user}>`,
       to: buyer.email,
       subject: `🎉 Ticket Details Confirmed - ${lotteryName} (#${buyer.id})`,
       html: htmlContent,
+      attachments,
     };
 
-    console.log(`[EmailService] Sending ticket details email to ${buyer.email} for Buyer #${buyer.id}...`);
+    console.log(`[EmailService] Sending ticket details email with PDF attachment to ${buyer.email} for Buyer #${buyer.id}...`);
     const info = await transporter.sendMail(mailOptions);
     console.log(`[EmailService] Email sent successfully: ${info.messageId}`);
 

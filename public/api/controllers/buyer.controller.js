@@ -195,6 +195,10 @@ exports.BuyLottery = (0, middlewares_1.asyncHandler)((req, res, next) => __await
     catch (leadSyncErr) {
         console.error("Lead CRM conversion sync error:", leadSyncErr);
     }
+    // Send real-time purchase notification to Telegram channel/group
+    services_1.TelegramService.sendPurchaseNotification(buyer.id).catch((telegramErr) => {
+        console.error(`[BuyLottery] Telegram notification error for buyer #${buyer.id}:`, telegramErr);
+    });
     return (0, response_util_1.SuccessResponse)(res, "Lottery bought successfully", {
         buyer,
         tickets: ticketsToInsert,
